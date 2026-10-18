@@ -1,0 +1,72 @@
+// Derived from Adapty iOS SDK 3.17.3 (MIT License, Copyright (c) 2020 Adapty Tech Inc.)
+//
+//  XeeConfiguration.Builder+Decodable.swift
+//  XeeSDK
+//
+//  Created by Aleksei Valiano on 23.04.2024.
+//
+
+import XeeLogger
+import Foundation
+
+extension XeeConfiguration.Builder: Decodable {
+    private enum CodingKeys: String, CodingKey {
+        case apiKey = "api_key"
+        case customerUserId = "customer_user_id"
+        case customerIdentityParameters = "customer_identity_parameters"
+        case observerMode = "observer_mode"
+        case idfaCollectionDisabled = "apple_idfa_collection_disabled"
+        case ipAddressCollectionDisabled = "ip_address_collection_disabled"
+        case clearDataOnBackup = "clear_data_on_backup"
+        case backendProxyHost = "backend_proxy_host"
+        case backendProxyPort = "backend_proxy_port"
+
+        case transactionFinishBehavior = "transaction_finish_behavior"
+        case logLevel = "log_level"
+
+        case crossPlatformSDKName = "cross_platform_sdk_name"
+        case crossPlatformSDKVersion = "cross_platform_sdk_version"
+
+        case serverCluster = "server_cluster"
+    }
+
+    public convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        let proxy: (host: String, port: Int)? =
+            if let host = try container.decodeIfPresent(String.self, forKey: .backendProxyHost),
+            let port = try container.decodeIfPresent(Int.self, forKey: .backendProxyPort) {
+                (host: host, port: port)
+            } else {
+                nil
+            }
+
+        let crossPlatformSDK: (name: String, version: String)? =
+            if let name = try container.decodeIfPresent(String.self, forKey: .crossPlatformSDKName),
+            let version = try container.decodeIfPresent(String.self, forKey: .crossPlatformSDKVersion) {
+                (name: name, version: version)
+            } else {
+                nil
+            }
+
+        let customerIdentityParameters = try container.decodeIfPresent(CustomerIdentityParameters.self, forKey: .customerIdentityParameters)
+
+        try self.init(
+            apiKey: container.decode(String.self, forKey: .apiKey),
+            customerUserId: container.decodeIfPresent(String.self, forKey: .customerUserId),
+            appAccountToken: customerIdentityParameters?.appAccountToken,
+            observerMode: container.decodeIfPresent(Bool.self, forKey: .observerMode),
+            idfaCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .idfaCollectionDisabled),
+            ipAddressCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .ipAddressCollectionDisabled),
+            callbackDispatchQueue: nil,
+            clearDataOnBackup: container.decodeIfPresent(Bool.self, forKey: .clearDataOnBackup),
+            serverCluster: container.decodeIfPresent(XeeServerCluster.self, forKey: .serverCluster),
+            devBaseUrls: [:],
+            backendProxy: proxy,
+            transactionFinishBehavior: nil,
+            logLevel: container.decodeIfPresent(XeeLog.Level.self, forKey: .logLevel),
+            crossPlatformSDK: crossPlatformSDK,
+            urlProtocolClasses: nil
+        )
+    }
+}

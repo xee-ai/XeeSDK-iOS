@@ -1,0 +1,76 @@
+// Derived from Adapty iOS SDK 3.17.3 (MIT License, Copyright (c) 2020 Adapty Tech Inc.)
+//
+//  Xee+UpdateAttributionData.swift
+//  XeeSDK
+//
+//  Created by Andrey Kyashkin on 28.10.2019.
+//
+
+import Foundation
+
+public extension Xee {
+    /// To set attribution data for the profile, use this method.
+    ///
+    /// Read more on the [Xee Documentation](https://xee.invalid/docs)
+    ///
+    /// - Parameter attribution: a dictionary containing attribution (conversion) data.
+    /// - Parameter source: a source of attribution.
+    nonisolated static func updateAttribution(
+        _ attribution: [AnyHashable: Any],
+        source: String
+    ) async throws(XeeError) {
+        let attributionJson: String
+        do {
+            let data = try JSONSerialization.data(withJSONObject: attribution)
+            attributionJson = String(decoding: data, as: UTF8.self)
+        } catch {
+            throw .wrongAttributeData(error)
+        }
+
+        try await updateAttribution(
+            attributionJson,
+            source: source
+        )
+    }
+
+    nonisolated static func updateAttribution(
+        _ attributionJson: String,
+        source: String
+    ) async throws(XeeError) {
+        let source = source.trimmed
+        // TODO: throw error if source isEmpty
+
+        let logParams: EventParameters = [
+            "source": source,
+        ]
+
+        try await withActivatedSDK(methodName: .updateAttributionData, logParams: logParams) { sdk throws(XeeError) in
+            try await sdk.setAttributionData(
+                source: source,
+                attributionJson: attributionJson
+            )
+        }
+    }
+
+    private func setAttributionData(
+        source: String,
+        attributionJson: String
+    ) async throws(XeeError) {
+        let (userId, oldResponseHash) = try await { () async throws(XeeError) in
+            let manager = try await createdProfileManager
+            return (manager.userId, manager.lastResponseHash)
+        }()
+
+        do {
+            let response = try await httpSession.setAttributionData(
+                userId: userId,
+                source: source,
+                attributionJson: attributionJson,
+                responseHash: oldResponseHash
+            )
+            handleProfileResponse(response)
+        } catch {
+            throw error.asXeeError
+        }
+    }
+}

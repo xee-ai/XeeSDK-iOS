@@ -1,0 +1,48 @@
+// Derived from Adapty iOS SDK 3.17.3 (MIT License, Copyright (c) 2020 Adapty Tech Inc.)
+//
+//  HTTPRequest.QueryItems.swift
+//  XeeSDK
+//
+//  Created by Aleksei Valiano on 11.09.2022.
+//
+
+import Foundation
+
+extension HTTPRequest {
+    typealias QueryItems = [URLQueryItem]
+}
+
+extension URLQueryItem {
+    init(name: String, value: CustomStringConvertible?) {
+        guard let value else {
+            self.init(name: name, value: nil)
+            return
+        }
+
+        self.init(name: name, value: value.description)
+    }
+
+    init(name: String, values: [some CustomStringConvertible]?) {
+        guard let array = values.nonEmptyOrNil else {
+            self.init(name: name, value: nil)
+            return
+        }
+
+        self.init(name: name, value: (array as? [String] ?? array.map { $0.description }).joined(separator: ","))
+    }
+}
+
+extension [HTTPRequest.QueryItems.Element] {
+    func notNil() -> Self {
+        filter { $0.value != nil }
+    }
+
+    init(key: String, array: [some CustomStringConvertible]?) {
+        guard let array else {
+            self = []
+            return
+        }
+
+        self = (array as? [String] ?? array.map { $0.description }).map { Element(name: "\(key)[]", value: $0) }
+    }
+}

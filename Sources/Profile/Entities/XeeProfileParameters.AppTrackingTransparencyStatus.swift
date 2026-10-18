@@ -1,0 +1,99 @@
+// Derived from Adapty iOS SDK 3.17.3 (MIT License, Copyright (c) 2020 Adapty Tech Inc.)
+//
+//  XeeProfileParameters.AppTrackingTransparencyStatus.swift
+//  XeeSDK
+//
+//  Created by Aleksei Valiano on 01.12.2022
+//
+
+import Foundation
+
+public extension XeeProfileParameters {
+    enum AppTrackingTransparencyStatus: Sendable, Hashable {
+        case unknown
+        case notDetermined
+        case restricted
+        case denied
+        case authorized
+    }
+}
+
+extension XeeProfileParameters.AppTrackingTransparencyStatus {
+    enum CodingStringValues: String {
+        case unknown
+        case notDetermined = "not_determined"
+        case restricted
+        case denied
+        case authorized
+    }
+
+    enum CodingIntValues: Int {
+        case unknown = -1
+        case notDetermined = 0
+        case restricted = 1
+        case denied = 2
+        case authorized = 3
+    }
+
+    var intRawValue: Int {
+        let value: CodingIntValues =
+            switch self {
+            case .notDetermined: .notDetermined
+            case .restricted: .restricted
+            case .denied: .denied
+            case .authorized: .authorized
+            case .unknown: .unknown
+            }
+        return value.rawValue
+    }
+
+    var stringRawValue: String {
+        let value: CodingStringValues =
+            switch self {
+            case .notDetermined: .notDetermined
+            case .restricted: .restricted
+            case .denied: .denied
+            case .authorized: .authorized
+            case .unknown: .unknown
+            }
+        return value.rawValue
+    }
+
+    init(from value: String) {
+        let value = CodingStringValues(rawValue: value)
+        switch value {
+        case .notDetermined: self = .notDetermined
+        case .restricted: self = .restricted
+        case .denied: self = .denied
+        case .authorized: self = .authorized
+        default: self = .unknown
+        }
+    }
+
+    init(from value: Int) {
+        let value = CodingIntValues(rawValue: value)
+        switch value {
+        case .notDetermined: self = .notDetermined
+        case .restricted: self = .restricted
+        case .denied: self = .denied
+        case .authorized: self = .authorized
+        default: self = .unknown
+        }
+    }
+}
+
+extension XeeProfileParameters.AppTrackingTransparencyStatus: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let value = try? container.decode(Int.self) {
+            self.init(from: value)
+        } else {
+            try self.init(from: container.decode(String.self))
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(intRawValue)
+    }
+}

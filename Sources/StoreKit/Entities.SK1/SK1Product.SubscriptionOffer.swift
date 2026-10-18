@@ -1,0 +1,56 @@
+// Derived from Adapty iOS SDK 3.17.3 (MIT License, Copyright (c) 2020 Adapty Tech Inc.)
+//
+//  SK1Product.SubscriptionOffer.swift
+//  XeeSDK
+//
+//  Created by Aleksei Valiano on 23.09.2024
+//
+
+import StoreKit
+
+extension SK1Product {
+    typealias SubscriptionOffer = SKProductDiscount
+
+    var introductoryOfferNotApplicable: Bool {
+        if let period = subscriptionPeriod,
+           period.numberOfUnits > 0,
+           introductoryPrice != nil
+        { false }
+        else
+        { true }
+    }
+
+    func sk1ProductSubscriptionOffer(by offerIdentifier: XeeSubscriptionOffer.Identifier) -> SubscriptionOffer? {
+        switch offerIdentifier {
+        case .introductory:
+            introductoryPrice
+        case let .promotional(id):
+            discounts.first(where: { $0.identifier == id })
+        case .winBack: nil
+        case .code: nil
+        }
+    }
+
+    func subscriptionOffer(by offerIdentifier: XeeSubscriptionOffer.Identifier) -> XeeSubscriptionOffer? {
+        guard let offer: SubscriptionOffer = sk1ProductSubscriptionOffer(by: offerIdentifier) else { return nil }
+
+        let locale = priceLocale
+        let period = offer.subscriptionPeriod.asXeeSubscriptionPeriod
+        return XeeSubscriptionOffer(
+            price: offer.price as Decimal,
+            currencyCode: locale.unfCurrencyCode,
+//            currencySymbol: locale.currencySymbol,
+            localizedPrice: locale.localized(sk1Price: offer.price),
+            offerIdentifier: offerIdentifier,
+            subscriptionPeriod: period,
+            numberOfPeriods: offer.numberOfPeriods,
+            paymentMode: offer.paymentMode.asPaymentMode,
+            localizedSubscriptionPeriod: locale.localized(period: period),
+            localizedNumberOfPeriods: locale.localized(period: period, numberOfPeriods: offer.numberOfPeriods)
+        )
+    }
+}
+
+extension SK1Product.SubscriptionOffer {
+    typealias OfferType = SKProductDiscount.`Type`
+}

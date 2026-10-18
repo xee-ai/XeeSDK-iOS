@@ -1,0 +1,30 @@
+// Derived from Adapty iOS SDK 3.17.3 (MIT License, Copyright (c) 2020 Adapty Tech Inc.)
+//
+//  EventsBackendConfiguration.swift
+//  XeeSDK
+//
+//  Created by Aleksei Valiano on 24.09.2022.
+//
+
+import Foundation
+
+struct EventsBackendConfiguration: Sendable {
+    var blacklist: Set<String>
+    let expiresAt: Date
+
+    init(_ state: BackendState) {
+        blacklist = state.eventBlacklist
+        expiresAt = state.expiresAt
+    }
+
+    init() {
+        blacklist = Set<String>()
+        expiresAt = Date(timeIntervalSince1970: 0)
+    }
+}
+
+extension EventsBackendConfiguration {
+    var isExpired: Bool {
+        expiresAt <= Date()
+    }
+}
