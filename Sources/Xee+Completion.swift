@@ -33,19 +33,19 @@ public extension Xee {
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
-    /// - Parameter apiKey: You can find it in your app settings in [Xee Dashboard](https://xee.invalid/docs) *App settings* > *General*.
+    /// - Parameter apiKey: Your app's SDK key, in the Xee dashboard under *App settings* > *iOS SDK*. It starts with `xee_`.
     /// - Parameter observerMode: A boolean value controlling [Observer mode](https://xee.invalid/docs). Turn it on if you handle purchases and subscription status yourself and use Xee for sending subscription events and analytics
     /// - Parameter customerUserId: User identifier in your system
     /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
     /// - Parameter completion: Result callback
     nonisolated static func activate(
-        _ apiKey: String,
+        withAPIKey apiKey: String,
         observerMode: Bool = false,
         customerUserId: String? = nil,
         _ completion: XeeErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(XeeError) in
-            try await activate(apiKey, observerMode: observerMode, customerUserId: customerUserId)
+            try await activate(withAPIKey: apiKey, observerMode: observerMode, customerUserId: customerUserId)
         }
     }
 

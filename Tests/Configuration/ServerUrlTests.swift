@@ -16,12 +16,19 @@ struct ServerUrlTests {
         }
     }
 
-    @Test func anUnconfiguredKindResolvesToAHostThatCannotResolve() {
-        // Xee has no built-in server. `.invalid` is reserved, so a missing configuration fails loudly.
-        for kind in XeeServerKind.allCases {
-            let host = Backend.defaultBaseUrl(kind: kind, by: .default).host
-            #expect(host?.hasSuffix(".invalid") == true, "kind \(kind) resolved to \(host ?? "nil")")
+    @Test func theDefaultServerIsTheLocalXeeServer() {
+        // Until a hosted server exists, an unconfigured SDK talks to the Xee server on this machine.
+        for cluster in [XeeServerCluster.default, .eu, .cn] {
+            for kind in XeeServerKind.allCases {
+                #expect(Backend.defaultBaseUrl(kind: kind, by: cluster).absoluteString == "http://localhost:7010/api/v1")
+            }
         }
+    }
+
+    @Test func aConfiguredServerReplacesTheDefault() {
+        let url = URL(string: "https://server.example.test")!
+        let builder = XeeConfiguration.builder(withAPIKey: "xee_0123456789abcdef0123456789abcdef").with(serverUrl: url)
+        #expect(builder.devBaseUrls[.main] == url)
     }
 
     @Test func noDefaultUrlPointsAtXee() {

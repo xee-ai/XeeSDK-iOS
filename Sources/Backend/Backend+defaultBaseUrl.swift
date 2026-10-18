@@ -11,11 +11,13 @@ import Foundation
 extension Backend {
     fileprivate static let basePath = "/api/v1"
 
-    /// Xee has no built-in server. A kind with no configured URL resolves to a host that can never
-    /// resolve (`.invalid` is reserved), so a missing `with(serverUrl:)` fails loudly instead of
-    /// sending traffic somewhere unintended.
+    /// The server the SDK talks to unless `with(serverUrl:)` says otherwise. For now it is the Xee
+    /// server running on this machine (the iOS Simulator reaches the Mac as `localhost`); change it
+    /// here when the hosted server exists. Every kind of request and every cluster uses it.
+    static let defaultServerUrl = "http://localhost:7010"
+
     static func defaultBaseUrl(kind _: XeeServerKind, by _: XeeServerCluster) -> URL {
-        URL(string: "https://xee.invalid\(basePath)")!
+        URL(string: "\(defaultServerUrl)\(basePath)")!
     }
 }
 
