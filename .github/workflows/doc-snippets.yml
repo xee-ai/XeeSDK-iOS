@@ -1,0 +1,18 @@
+# The code samples the docs show must compile against this SDK. A change that breaks one fails here, so
+# the sample is fixed in the same pull request. See DocSnippets/README.md.
+
+name: doc-snippets
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the doc samples for iOS
+        working-directory: DocSnippets
+        run: xcodebuild -scheme XeeDocSnippets -destination 'generic/platform=iOS' build

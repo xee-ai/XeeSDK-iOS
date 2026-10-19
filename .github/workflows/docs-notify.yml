@@ -1,0 +1,62 @@
+# When a pull request changes the SDK's code or the doc samples, say so where the docs are kept: a
+# checklist on the pull request, and a signal to the xee-skills repository so its docs checks run
+# against the new code. The signal needs a token; without one, the checklist still appears.
+
+name: docs-notify
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/**'
+      - 'Sources.Logger/**'
+      - 'DocSnippets/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: List the declarations this pull request changes
+        id: api
+        run: |
+          git diff -U0 "origin/${{ github.base_ref }}...HEAD" -- Sources Sources.Logger \
+            | grep -E '^[+-][^+-].*\b(public|open|static func|func with|case |struct |enum |class |protocol )' \
+            | head -40 > /tmp/api.txt || true
+          echo "count=$(wc -l < /tmp/api.txt | tr -d ' ')" >> "$GITHUB_OUTPUT"
+      - name: Comment a docs checklist
+        if: steps.api.outputs.count != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "### Docs check"
+            echo
+            echo "This pull request changes declarations in the SDK. The docs (https://github.com/xee-ai/xee-skills, \`plugin/skills/xee-docs/docs/\`) may need to change with it."
+            echo
+            echo "- [ ] The doc samples in \`DocSnippets/\` still build and show the new API"
+            echo "- [ ] Pages that describe changed behaviour (a default, a step, an error) are updated in xee-skills, or none are affected"
+            echo
+            echo "<details><summary>Changed declarations</summary>"
+            echo
+            echo '```diff'
+            cat /tmp/api.txt
+            echo '```'
+            echo "</details>"
+          } > /tmp/comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/comment.md
+      - name: Tell the docs repository to check itself
+        if: steps.api.outputs.count != '0' && env.DOCS_REPO_TOKEN != ''
+        env:
+          DOCS_REPO_TOKEN: ${{ secrets.DOCS_REPO_TOKEN }}
+        run: |
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $DOCS_REPO_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/xee-ai/xee-skills/dispatches \
+            -d '{"event_type":"sdk-changed"}'
