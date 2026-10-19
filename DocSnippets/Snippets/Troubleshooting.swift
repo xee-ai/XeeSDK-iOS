@@ -4,7 +4,6 @@ import Xee
 private func logsOnTheConfiguration() {
     // snippet: troubleshooting-verbose-configuration
     let configuration = XeeConfiguration.builder(withAPIKey: "xee_YOUR_SDK_KEY")
-        .with(serverUrl: URL(string: "https://xee.example.test")!)
         .with(logLevel: .verbose)
         .build()
     // end snippet

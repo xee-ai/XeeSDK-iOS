@@ -62,7 +62,6 @@ private func activateWithConfiguration() {
     // snippet: activate-with-configuration
     let configuration = XeeConfiguration
         .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-        .with(serverUrl: URL(string: "https://xee.example.test")!)
         .with(logLevel: .verbose) // for development; remove or lower for release
         .build()
 
@@ -94,7 +93,6 @@ private func dataCollection() {
     // snippet: data-collection
     let configuration = XeeConfiguration
         .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-        .with(serverUrl: URL(string: "https://xee.example.test")!)
         .with(idfaCollectionDisabled: true)
         .with(ipAddressCollectionDisabled: true)
         .build()

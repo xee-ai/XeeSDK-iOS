@@ -11,7 +11,6 @@ private func track(_ name: String, _ value: Bool) {} // The reader's own analyti
 private func activateForMigration(user: AppUser) async throws { // docs:hide
 let configuration = XeeConfiguration
     .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-    .with(serverUrl: URL(string: "https://xee.example.test")!)
     .with(customerUserId: user.id, withAppAccountToken: user.appAccountToken)
     .with(observerMode: true) // While Adapty still sells. Remove this line when Xee takes over purchases.
     .build()

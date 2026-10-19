@@ -5,7 +5,6 @@ private func identifyAtActivation(user: AppUser) async throws {
     // snippet: identify-at-activation
     let configuration = XeeConfiguration
         .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-        .with(serverUrl: URL(string: "https://xee.example.test")!)
         .with(customerUserId: user.id, withAppAccountToken: user.appAccountToken)
         .build()
 
