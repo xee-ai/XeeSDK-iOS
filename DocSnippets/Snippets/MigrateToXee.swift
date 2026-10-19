@@ -9,13 +9,20 @@ private func track(_ name: String, _ value: Bool) {} // The reader's own analyti
 
 // snippet: migrate-activate
 private func activateForMigration(user: AppUser) async throws { // docs:hide
-let configuration = XeeConfiguration
-    .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-    .with(customerUserId: user.id, withAppAccountToken: user.appAccountToken)
-    .with(observerMode: true) // While Adapty still sells. Remove this line when Xee takes over purchases.
-    .build()
+// Observer mode leaves StoreKit to Adapty. Remove observerMode when Xee takes over purchases.
+try await Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY", observerMode: true)
+try await Xee.identify(user.id, withAppAccountToken: user.appAccountToken)
+} // docs:hide
+// end snippet
 
-try await Xee.activate(with: configuration)
+// snippet: migrate-activate-completion
+private func activateForMigrationWithCompletion(user: AppUser) { // docs:hide
+// Observer mode leaves StoreKit to Adapty. Remove observerMode when Xee takes over purchases.
+Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY", observerMode: true) { error in
+    if error == nil {
+        Xee.identify(user.id, withAppAccountToken: user.appAccountToken)
+    }
+}
 } // docs:hide
 // end snippet
 

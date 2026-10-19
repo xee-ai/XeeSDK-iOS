@@ -3,12 +3,17 @@ import Xee
 
 private func identifyAtActivation(user: AppUser) async throws {
     // snippet: identify-at-activation
-    let configuration = XeeConfiguration
-        .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-        .with(customerUserId: user.id, withAppAccountToken: user.appAccountToken)
-        .build()
+    try await Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY", customerUserId: user.id)
+    // end snippet
+}
 
-    try await Xee.activate(with: configuration)
+private func identifyAtActivationWithCompletion(user: AppUser) {
+    // snippet: identify-at-activation-completion
+    Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY", customerUserId: user.id) { error in
+        if let error {
+            // handle the XeeError
+        }
+    }
     // end snippet
 }
 

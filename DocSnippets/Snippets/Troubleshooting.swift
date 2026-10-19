@@ -1,11 +1,10 @@
 import Foundation
 import Xee
 
-private func logsOnTheConfiguration() {
-    // snippet: troubleshooting-verbose-configuration
-    let configuration = XeeConfiguration.builder(withAPIKey: "xee_YOUR_SDK_KEY")
-        .with(logLevel: .verbose)
-        .build()
+private func logsBeforeActivation() async throws {
+    // snippet: troubleshooting-verbose-logs
+    Xee.logLevel = .verbose
+    try await Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY")
     // end snippet
 }
 
