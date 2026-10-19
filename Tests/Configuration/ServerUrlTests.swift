@@ -16,11 +16,11 @@ struct ServerUrlTests {
         }
     }
 
-    @Test func theDefaultServerIsTheLocalXeeServer() {
-        // Until a hosted server exists, an unconfigured SDK talks to the Xee server on this machine.
+    @Test func theDefaultServerIsTheHostedXeeServer() {
+        // An unconfigured SDK talks to the hosted Xee server.
         for cluster in [XeeServerCluster.default, .eu, .cn] {
             for kind in XeeServerKind.allCases {
-                #expect(Backend.defaultBaseUrl(kind: kind, by: cluster).absoluteString == "http://localhost:7010/api/v1")
+                #expect(Backend.defaultBaseUrl(kind: kind, by: cluster).absoluteString == "https://api.xee.ai/api/v1")
             }
         }
     }
