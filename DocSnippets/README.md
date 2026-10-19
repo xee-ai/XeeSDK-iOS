@@ -23,7 +23,7 @@ let configuration = XeeConfiguration.builder(withAPIKey: "xee_YOUR_SDK_KEY").bui
 - The id is lowercase words joined by hyphens, and it is unique across this folder.
 - A snippet is shown as written, dedented. Keep it what a reader would paste.
 - A line ending in `// docs:hide` compiles here but is left out of the page. Use it for scaffolding such as a stub `ContentView`.
-- Leave out `.with(serverUrl:)`: the SDK's default server is the hosted one. If a sample must show another server, write `https://xee.example.test` there: the sync turns it into the `{{server}}` placeholder that the dashboard fills in.
+- Leave out `.with(serverUrl:)`: the SDK already talks to Xee, and the docs say nothing about a server.
 - A snippet that needs a type the docs do not define (a `PaywallView`, a user model) declares a minimal one on `docs:hide` lines.
 
 Build it for iOS from this folder (a separate package, so the SDK package stays what apps install):

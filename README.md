@@ -3,7 +3,6 @@
 iOS SDK for the Xee subscription server. Derived from the Adapty iOS SDK 3.17.3 (MIT License, Copyright (c) 2020 Adapty Tech Inc.): same structure and wire format (paths and JSON keys), renamed to Xee, with the paywall builder removed.
 
 - Products: `Xee`, `XeeLogger` (Swift Package Manager only; iOS 13+, macOS 11+, visionOS 1+).
-- The default server is `https://api.xee.ai`. To use another one, such as a Xee server on your Mac (the iOS Simulator reaches it as `http://localhost:7010`): `XeeConfiguration.builder(withAPIKey:).with(serverUrl:)`.
 - Public keys start with `xee_`. Requests send `Authorization: Api-Key <key>` and `xee-*` headers.
 
 ```swift
