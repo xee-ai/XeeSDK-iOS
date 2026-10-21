@@ -20,6 +20,7 @@ extension Event {
         case onboardingScreenShowed = "new_onboarding_screen_showed"
 
         case profileRefundSaverSettings = "profile_refund_saver_settings"
+        case activity = "xee_activity"
     }
 
     var name: String {
@@ -41,6 +42,8 @@ extension Event {
                 .profileRefundSaverSettings
             case .refundPreference:
                 .profileRefundSaverSettings
+            case .activity:
+                .activity
             }
 
         return name.rawValue

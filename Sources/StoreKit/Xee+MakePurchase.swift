@@ -20,6 +20,19 @@ public extension Xee {
     nonisolated static func makePurchase(
         product: XeePaywallVariantProduct
     ) async throws(XeeError) -> XeePurchaseResult {
+        do {
+            let result = try await purchase(product: product)
+            trackPurchase(result, productId: product.vendorProductId, variationId: product.variationId)
+            return result
+        } catch {
+            trackActivity(.purchase, .failed, productId: product.vendorProductId, variationId: product.variationId, error: error)
+            throw error
+        }
+    }
+
+    private nonisolated static func purchase(
+        product: XeePaywallVariantProduct
+    ) async throws(XeeError) -> XeePurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
             logParams: [
@@ -55,6 +68,19 @@ public extension Xee {
     nonisolated static func makePurchase(
         product: XeeDeferredProduct
     ) async throws(XeeError) -> XeePurchaseResult {
+        do {
+            let result = try await purchase(product: product)
+            trackPurchase(result, productId: product.vendorProductId, variationId: nil)
+            return result
+        } catch {
+            trackActivity(.purchase, .failed, productId: product.vendorProductId, error: error)
+            throw error
+        }
+    }
+
+    private nonisolated static func purchase(
+        product: XeeDeferredProduct
+    ) async throws(XeeError) -> XeePurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
             logParams: [
@@ -73,11 +99,28 @@ public extension Xee {
     /// - Returns: The ``XeeProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
     /// - Throws: An ``XeeError`` object
     nonisolated static func restorePurchases() async throws(XeeError) -> XeeProfile {
-        try await withActivatedSDK(methodName: .restorePurchases) { sdk throws(XeeError) in
-            let manager = try await sdk.createdProfileManager
-            try await sdk.syncTransactionHistory(for: manager.userId, forceSync: true)
-            return await manager.fetchProfile()
+        do {
+            let profile = try await withActivatedSDK(methodName: .restorePurchases) { sdk throws(XeeError) in
+                let manager = try await sdk.createdProfileManager
+                try await sdk.syncTransactionHistory(for: manager.userId, forceSync: true)
+                return await manager.fetchProfile()
+            }
+            trackActivity(.restore, .success)
+            return profile
+        } catch {
+            trackActivity(.restore, .failed, error: error)
+            throw error
         }
+    }
+
+    private nonisolated static func trackPurchase(_ result: XeePurchaseResult, productId: String, variationId: String?) {
+        let outcome: XeeActivityParameters.Result =
+            switch result {
+            case .success: .success
+            case .userCancelled: .cancelled
+            case .pending: .pending
+            }
+        trackActivity(.purchase, outcome, productId: productId, variationId: variationId)
     }
 }
 

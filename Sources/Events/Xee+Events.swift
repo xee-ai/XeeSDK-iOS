@@ -52,6 +52,28 @@ extension Xee {
         }
     }
 
+    /// Reports a purchase or a restore and how it ended, for the profile's activity in the dashboard.
+    /// It never throws and never waits: the purchase's own result is what the caller gets.
+    nonisolated static func trackActivity(
+        _ kind: XeeActivityParameters.Kind,
+        _ result: XeeActivityParameters.Result,
+        productId: String? = nil,
+        variationId: String? = nil,
+        error: Error? = nil,
+        date: Date = Date()
+    ) {
+        let parameters = XeeActivityParameters(
+            kind: kind,
+            result: result,
+            productId: productId,
+            variationId: variationId,
+            error: error.map { String(describing: $0).prefix(300).description }
+        )
+        Task.detached(priority: .utility) {
+            try? await trackEvent(.activity(parameters), date: date)
+        }
+    }
+
     nonisolated static func trackEventIfNeed(
         _ chosen: XeePaywallChosen<some PaywallContent>,
         date: Date = Date()
