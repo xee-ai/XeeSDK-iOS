@@ -15,6 +15,15 @@ private func getProfileAsync() async {
     // end snippet
 }
 
+private func getProfileMaxAge() async throws {
+    // snippet: get-profile-max-age
+    // Always ask the server, for example right before selling.
+    let profile = try await Xee.getProfile(maxAge: 0)
+    let premium = profile.accessLevels["premium"]?.isActive ?? false
+    // end snippet
+    _ = premium
+}
+
 private func getProfileCompletion() {
     // snippet: get-profile-completion
     Xee.getProfile { result in

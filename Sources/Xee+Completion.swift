@@ -93,14 +93,18 @@ public extension Xee {
 
     /// The main function for getting a user profile. Allows you to define the level of access, as well as other parameters.
     ///
-    /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Xee SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Xee SDK updates XeeProfile cache on a regular basis, in order to keep this information as up-to-date as possible.
+    /// Returns the saved profile when the server confirmed it less than `maxAge` seconds ago (5 minutes by
+    /// default), otherwise asks the server. See ``getProfile(maxAge:)``.
     ///
-    /// - Parameter completion: the result containing a `XeeProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+    /// - Parameters:
+    ///   - maxAge: How old, in seconds, the saved profile may be. Pass `0` to always ask the server.
+    ///   - completion: the result containing a `XeeProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
     nonisolated static func getProfile(
+        maxAge: TimeInterval = defaultProfileMaxAge,
         _ completion: @escaping XeeResultCompletion<XeeProfile>
     ) {
         withCompletion(completion) { () async throws(XeeError) in
-            try await getProfile()
+            try await getProfile(maxAge: maxAge)
         }
     }
 

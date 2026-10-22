@@ -96,7 +96,7 @@ final class LifecycleManager {
             newStorefrontCountryAvailable = nil
         } else {
             log.verbose("LifecycleManager: \(stamp) syncProfile")
-            _ = try await Xee.getProfile()
+            _ = try await Xee.getProfile(maxAge: 0)
         }
     }
 
@@ -158,7 +158,7 @@ final class LifecycleManager {
 
                 switch status {
                 case .allowed:
-                    _ = try? await Xee.getProfile()
+                    _ = try? await Xee.getProfile(maxAge: 0)
                     return
                 case .notDetermined:
                     try await Task.sleep(seconds: Constants.idfaStatusCheckInterval)

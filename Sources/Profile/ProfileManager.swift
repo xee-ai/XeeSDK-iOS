@@ -13,6 +13,9 @@ final class ProfileManager {
     let userId: XeeUserId
 
     private var cachedProfile: VH<XeeProfile>
+    /// When the server last confirmed `cachedProfile`, in this launch. Nil until then, so the first
+    /// `getProfile(maxAge:)` after launch, `identify` or `logout` always asks the server.
+    private var syncedAt: Date?
     private var onceSentEnvironment: SentEnvironment
     private let storage: ProfileStorage
 
@@ -53,6 +56,7 @@ final class ProfileManager {
         _ newProfile: VH<XeeProfile>
     ) throws(WrongProfileIdError) -> Task<XeeProfile, Never>? {
         guard newProfile.isEqualProfileId(userId) else { throw WrongProfileIdError() }
+        syncedAt = Date()
 
         if newProfile.IsNotEqualHash(cachedProfile),
            newProfile.isNewerOrEqualVersion(cachedProfile)
@@ -106,6 +110,27 @@ final class ProfileManager {
         return await profileWithOfflineAccessLevels
     }
 
+    /// The saved profile when the server confirmed it less than `maxAge` ago, else a fresh one.
+    func fetchProfile(maxAge: TimeInterval) async -> XeeProfile {
+        let levels = cachedProfile.value.accessLevels.values.map { (isActive: $0.isActive, expiresAt: $0.expiresAt) }
+        if Self.isFresh(syncedAt: syncedAt, maxAge: maxAge, accessLevels: levels, now: Date()) {
+            return await profileWithOfflineAccessLevels
+        }
+        return await fetchProfile()
+    }
+
+    /// A saved profile can stand in for the server's answer only while it is younger than `maxAge` and
+    /// no access it reports as active has reached its end: a cache must never keep access alive.
+    nonisolated static func isFresh(
+        syncedAt: Date?,
+        maxAge: TimeInterval,
+        accessLevels: [(isActive: Bool, expiresAt: Date?)],
+        now: Date
+    ) -> Bool {
+        guard maxAge > 0, let syncedAt, now.timeIntervalSince(syncedAt) < maxAge else { return false }
+        return !accessLevels.contains { $0.isActive && ($0.expiresAt.map { $0 <= now } ?? false) }
+    }
+
     private func syncProfile(
         params: XeeProfileParameters?
     ) async throws(XeeError) -> XeeProfile {
@@ -147,6 +172,8 @@ final class ProfileManager {
         {
             return profile
         }
+        // No body: the server says the saved profile is still current.
+        if response == nil { syncedAt = Date() }
 
         return await profileWithOfflineAccessLevels
     }
