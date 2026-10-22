@@ -9,7 +9,7 @@
 import Foundation
 
 extension Xee {
-    public nonisolated static let SDKVersion = "0.1.0"
+    public nonisolated static let SDKVersion = "0.2.0"
     nonisolated static let fallbackFormatVersion = 9
     nonisolated static let userAcquisitionVersion = 1
 
