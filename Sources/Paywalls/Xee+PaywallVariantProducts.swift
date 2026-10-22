@@ -22,22 +22,11 @@ public extension Xee {
             methodName: .getPaywallVariantProducts,
             logParams: ["paywall_id": paywallVariant.paywall.id]
         ) { sdk throws(XeeError) in
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-                if let manager = sdk.productsManager as? SK2ProductsManager {
-                    return try await sdk.getSK2PaywallVariantProducts(
-                        paywallVariant: paywallVariant,
-                        productsManager: manager
-                    )
-                }
-            } else {
-                if let manager = sdk.productsManager as? SK1ProductsManager {
-                    return try await sdk.getSK1PaywallVariantProducts(
-                        paywallVariant: paywallVariant,
-                        productsManager: manager
-                    )
-                }
-            }
-            return []
+            guard let manager = sdk.productsManager as? SK2ProductsManager else { return [] }
+            return try await sdk.getSK2PaywallVariantProducts(
+                paywallVariant: paywallVariant,
+                productsManager: manager
+            )
         }
     }
 
@@ -46,74 +35,11 @@ public extension Xee {
             methodName: .getPaywallVariantProductsWithoutDeterminingOffer,
             logParams: ["paywall_id": paywallVariant.paywall.id]
         ) { sdk throws(XeeError) in
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-                if let manager = sdk.productsManager as? SK2ProductsManager {
-                    return try await sdk.getSK2PaywallVariantProductsWithoutOffers(
-                        paywallVariant: paywallVariant,
-                        productsManager: manager
-                    )
-                }
-            } else {
-                if let manager = sdk.productsManager as? SK1ProductsManager {
-                    return try await sdk.getSK1PaywallVariantProductsWithoutOffers(
-                        paywallVariant: paywallVariant,
-                        productsManager: manager
-                    )
-                }
-            }
-            return []
-        }
-    }
-
-    package nonisolated static func getPaywallVariantProduct(
-        xeeProductId: String,
-        productInfo: BackendProductInfo,
-        paywallVariantProductIndex: Int,
-        subscriptionOfferIdentifier: XeeSubscriptionOffer.Identifier?,
-        variationId: String,
-        paywallVariantABTestName: String,
-        paywallVariantName: String,
-        webPaywallVariantBaseUrl: URL?
-    ) async throws(XeeError) -> XeePaywallVariantProduct {
-        let sdk = try await Xee.activatedSDK
-
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            guard let manager = sdk.productsManager as? SK2ProductsManager else {
-                throw .cantMakePayments()
-            }
-            return try await sdk.getSK2PaywallVariantProduct(
-                xeeProductId: xeeProductId,
-                productInfo: productInfo,
-                paywallVariantProductIndex: paywallVariantProductIndex,
-                subscriptionOfferIdentifier: subscriptionOfferIdentifier,
-                variationId: variationId,
-                paywallVariantABTestName: paywallVariantABTestName,
-                paywallVariantName: paywallVariantName,
-                webPaywallVariantBaseUrl: webPaywallVariantBaseUrl,
+            guard let manager = sdk.productsManager as? SK2ProductsManager else { return [] }
+            return try await sdk.getSK2PaywallVariantProductsWithoutOffers(
+                paywallVariant: paywallVariant,
                 productsManager: manager
             )
-
-        } else {
-            guard let manager = sdk.productsManager as? SK1ProductsManager else {
-                throw .cantMakePayments()
-            }
-            return try await sdk.getSK1PaywallVariantProduct(
-                xeeProductId: xeeProductId,
-                productInfo: productInfo,
-                paywallVariantProductIndex: paywallVariantProductIndex,
-                subscriptionOfferIdentifier: subscriptionOfferIdentifier,
-                variationId: variationId,
-                paywallVariantABTestName: paywallVariantABTestName,
-                paywallVariantName: paywallVariantName,
-                productsManager: manager,
-                webPaywallVariantBaseUrl: webPaywallVariantBaseUrl
-            )
         }
-    }
-
-    package nonisolated static func persistOnboardingVariationId(
-        _ variationId: String
-    ) async {
-        await Xee.optionalSDK?.purchasePayloadStorage.setOnboardingVariationId(variationId)
     }
 }

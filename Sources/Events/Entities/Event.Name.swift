@@ -16,8 +16,6 @@ extension Event {
 
         case system = "system_log"
         case paywallVariantAssigned = "paywall_variation_assigned"
-        case onboardingVariationAssigned = "onboarding_variation_assigned"
-        case onboardingScreenShowed = "new_onboarding_screen_showed"
 
         case profileRefundSaverSettings = "profile_refund_saver_settings"
         case activity = "xee_activity"
@@ -34,10 +32,6 @@ extension Event {
                 .system
             case .paywallVariantAssigned:
                 .paywallVariantAssigned
-            case .onboardingVariationAssigned:
-                .onboardingVariationAssigned
-            case .onboardingScreenShowed:
-                .onboardingScreenShowed
             case .сonsentToCollectingRefundData:
                 .profileRefundSaverSettings
             case .refundPreference:

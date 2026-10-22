@@ -99,8 +99,6 @@ extension StoreKitManagerError: CustomXeeError {
         return switch self {
         case .interrupted: .operationInterrupted
         case .noProductIDsFound: .noProductIDsFound
-        case .receiptIsEmpty: .cantReadReceipt
-        case .refreshReceiptFailed: .refreshReceiptFailed
         case .requestSKProductsFailed: .productRequestFailed
         case .productPurchaseFailed: .productPurchaseFailed
         case .unknownTransactionId: .unknownTransactionId

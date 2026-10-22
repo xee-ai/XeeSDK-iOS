@@ -106,25 +106,3 @@ private func restoreCompletion() {
     }
     // end snippet
 }
-
-// snippet: promoted-purchase-delegate
-import Xee
-
-final class PurchaseDelegate: XeeDelegate {
-    func didLoadLatestProfile(_ profile: XeeProfile) {}
-
-    func shouldAddStorePayment(for product: XeeDeferredProduct) -> Bool {
-        // Keep `product` somewhere, then return false to wait.
-        false
-    }
-}
-
-// Later, when the app is ready:
-func resume(_ product: XeeDeferredProduct) async {
-    do {
-        _ = try await Xee.makePurchase(product: product)
-    } catch {
-        // Show the error.
-    }
-}
-// end snippet

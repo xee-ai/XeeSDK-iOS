@@ -4,8 +4,8 @@ import PackageDescription
 let package = Package(
     name: "Xee",
     platforms: [
-        .iOS(.v13),
-        .macOS(.v11),
+        .iOS(.v15),
+        .macOS(.v12),
         .visionOS(.v1),
     ],
     products: [

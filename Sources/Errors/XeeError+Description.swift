@@ -53,8 +53,6 @@ extension StoreKitManagerError: CustomDebugStringConvertible {
         switch self {
         case .interrupted: "The operation was interrupted."
         case .noProductIDsFound: "No valid In-App Purchase products were found. Please check your product configuration on the App Store Connect and Xee Dashboard."
-        case .receiptIsEmpty: "No valid purchase receipt found."
-        case .refreshReceiptFailed: "Failed to refresh the purchase receipt."
         case .productPurchaseFailed: "Failed to complete the product purchase. Refer to the original error for more details."
         case .requestSKProductsFailed: "Failed to fetch product information from the StoreKit. Refer to the original error for more details."
         case .unknownTransactionId: "Transaction identifier is nil"

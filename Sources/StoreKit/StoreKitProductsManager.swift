@@ -13,12 +13,6 @@ protocol StoreKitProductsManager: Actor, Sendable {
     func fetchProduct(id productId: String, fetchPolicy: ProductsFetchPolicy) async throws(XeeError) -> XeeProduct?
 }
 
-extension SK1ProductsManager: StoreKitProductsManager {
-    func fetchProduct(id productId: String, fetchPolicy: ProductsFetchPolicy) async throws(XeeError) -> XeeProduct? {
-        try await fetchSK1Product(id: productId, fetchPolicy: fetchPolicy).asXeeProduct
-    }
-}
-
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2ProductsManager: StoreKitProductsManager {
     func fetchProduct(id productId: String, fetchPolicy: ProductsFetchPolicy) async throws(XeeError) -> XeeProduct? {

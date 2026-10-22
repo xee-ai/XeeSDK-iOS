@@ -49,17 +49,6 @@ struct FallbackTests {
         ])
     }
 
-    @Test func testOnboardings() throws {
-        try test(type: XeeOnboarding.self, json: Json.medium, paywallIds: [
-            "TestLera",
-            "TestLera2",
-            "evg",
-            "evg2",
-            "evg3",
-            "mirazim-test",
-        ])
-    }
-
     private func test<Content: PaywallContent>(type: Content.Type, json: Json, paywallIds: [String]) throws {
         let fallback = try FallbackPaywalls(fileURL: json.url)
 

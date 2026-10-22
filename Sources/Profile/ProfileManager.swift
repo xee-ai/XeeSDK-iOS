@@ -16,9 +16,7 @@ final class ProfileManager {
     private var onceSentEnvironment: SentEnvironment
     private let storage: ProfileStorage
 
-    let crossPlacmentStorage = CrossPaywallStorage()
     let paywallStorage = PaywallStorage()
-    let backendIntroductoryOfferEligibilityStorage = BackendIntroductoryOfferEligibilityStorage()
 
     var currentProfile: XeeProfile { cachedProfile.value }
     var isTestUser: Bool { cachedProfile.value.isTestUser }

@@ -9,7 +9,7 @@
 import StoreKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct XeeSK2PaywallVariantProduct: XeeSK2Product, XeePaywallVariantProduct, WebPaywallVariantURLProviding {
+struct XeeSK2PaywallVariantProduct: XeeSK2Product, XeePaywallVariantProduct {
     let skProduct: SK2Product
 
     public let xeeProductId: String
@@ -32,15 +32,13 @@ struct XeeSK2PaywallVariantProduct: XeeSK2Product, XeePaywallVariantProduct, Web
     /// Same as `name` property of the parent XeePaywallVariant.
     public let paywallVariantName: String
 
-    let webPaywallVariantBaseUrl: URL?
-
     public var description: String {
         "(xeeProductId: \(xeeProductId), info: \(productInfo), paywallVariantName: \(paywallVariantName), variationId: \(variationId), paywallVariantABTestName: \(paywallVariantABTestName), subscriptionOffer:\(subscriptionOffer.map { $0.description } ?? "nil") , skProduct:\(skProduct)"
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct XeeSK2PaywallVariantProductWithoutDeterminingOffer: XeeSK2Product, XeePaywallVariantProductWithoutDeterminingOffer, WebPaywallVariantURLProviding {
+struct XeeSK2PaywallVariantProductWithoutDeterminingOffer: XeeSK2Product, XeePaywallVariantProductWithoutDeterminingOffer {
     let skProduct: SK2Product
 
     public let xeeProductId: String
@@ -59,8 +57,6 @@ struct XeeSK2PaywallVariantProductWithoutDeterminingOffer: XeeSK2Product, XeePay
 
     /// Same as `name` property of the parent XeePaywallVariant.
     public let paywallVariantName: String
-
-    let webPaywallVariantBaseUrl: URL?
 
     public var description: String {
         "(xeeProductId: \(xeeProductId), info: \(productInfo), paywallVariantName: \(paywallVariantName), variationId: \(variationId), paywallVariantABTestName: \(paywallVariantABTestName), skProduct:\(skProduct)"

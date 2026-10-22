@@ -18,8 +18,6 @@ public struct XeePaywall: Sendable, Identifiable {
 
     let audienceVersionId: String
 
-    let shouldTrackOnboardingShown: Bool
-
     var version: Int64
 }
 
@@ -49,7 +47,6 @@ extension XeePaywall: Codable {
         case revision
         case abTestName = "ab_test_name"
         case audienceVersionId = "paywall_audience_version_id"
-        case shouldTrackOnboardingShown = "is_tracking_purchases"
         case version = "response_created_at"
     }
 
@@ -62,7 +59,6 @@ extension XeePaywall: Codable {
         revision = try paywall.decode(Int.self, forKey: .revision)
         abTestName = try paywall.decode(String.self, forKey: .abTestName)
         audienceVersionId = try paywall.decode(String.self, forKey: .audienceVersionId)
-        shouldTrackOnboardingShown = try paywall.decodeIfPresent(Bool.self, forKey: .shouldTrackOnboardingShown) ?? false
         version = try container.decodeIfPresent(Int64.self, forKey: .version) ?? 0
     }
 
@@ -75,9 +71,6 @@ extension XeePaywall: Codable {
         try paywall.encode(revision, forKey: .revision)
         try paywall.encode(abTestName, forKey: .abTestName)
         try paywall.encode(audienceVersionId, forKey: .audienceVersionId)
-        if shouldTrackOnboardingShown {
-            try paywall.encode(shouldTrackOnboardingShown, forKey: .shouldTrackOnboardingShown)
-        }
         try container.encode(version, forKey: .version)
     }
 }

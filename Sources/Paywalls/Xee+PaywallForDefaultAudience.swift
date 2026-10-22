@@ -46,32 +46,6 @@ extension Xee {
         }
     }
 
-    public nonisolated static func getOnboardingForDefaultAudience(
-        paywallId: String,
-        locale: String? = nil,
-        fetchPolicy: XeePaywallFetchPolicy = .default
-    ) async throws(XeeError) -> XeeOnboarding {
-        let locale = locale.trimmed.nonEmptyOrNil.map { XeeLocale($0) } ?? .defaultPaywallLocale
-        let paywallId = paywallId.trimmed
-        // TODO: throw error if paywallId isEmpty
-
-        let logParams: EventParameters = [
-            "paywall_id": paywallId,
-            "locale": locale,
-            "fetch_policy": fetchPolicy,
-        ]
-
-        return try await withActivatedSDK(methodName: .getOnboardingForDefaultAudience, logParams: logParams) { sdk throws(XeeError) in
-            let onboarding: XeeOnboarding = try await sdk.getPaywallForDefaultAudience(
-                paywallId,
-                locale,
-                fetchPolicy
-            )
-
-            return onboarding
-        }
-    }
-
     private func getPaywallForDefaultAudience<Content: PaywallContent>(
         _ paywallId: String,
         _ locale: XeeLocale,
@@ -125,8 +99,6 @@ extension Xee {
                 paywallId: paywallId,
                 locale: locale,
                 cached: cached,
-                crossPaywallEligible: false,
-                variationIdResolver: nil,
                 disableServerCache: isTestUser,
                 timeoutInterval: nil
             )
@@ -142,8 +114,7 @@ extension Xee {
             guard let content: Content = getCacheOrFallbackFilePaywall(
                 userId,
                 paywallId,
-                locale,
-                withCrossPlacmentABTest: false
+                locale
             ) else {
                 throw error.asXeeError
             }

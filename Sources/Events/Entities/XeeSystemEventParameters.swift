@@ -131,7 +131,6 @@ enum MethodName: String {
     case updateProfile = "update_profile"
     case updateAttribution = "update_attribution"
     case updateAttributionData = "update_attribution_data"
-    case setIntegrationIdentifiers = "set_integration_identifiers"
 
     case setVariationId = "set_variation_id"
     case manualFinishTransaction = "manual_finish_transaction"
@@ -140,21 +139,15 @@ enum MethodName: String {
     case reportSK2Transaction = "report_transaction_sk2"
     case getPaywallVariantProducts = "get_paywall_variant_products"
     case getPaywallVariantProductsWithoutDeterminingOffer = "get_paywall_variant_products_without_determining_offer"
-    case getProductsIntroductoryOfferEligibilityByStrings = "get_products_introductory_offer_eligibility_by_strings"
-    case getReceipt = "get_receipt"
     case makePurchase = "make_purchase"
-    case openWebPaywallVariant = "open_web_paywall"
-    case createWebPaywallVariantUrl = "create_web_paywall_variant_url"
     case getUnfinishedTransactions = "get_unfinished_transactions"
 
     case getCurrentInstallationStatus = "get_current_installation_status"
     case restorePurchases = "restore_purchases"
 
     case getPaywallVariant = "get_paywall"
-    case getOnboarding = "get_onboarding"
 
     case getPaywallVariantForDefaultAudience = "get_paywall_variant_for_default_audience"
-    case getOnboardingForDefaultAudience = "get_onboarding_for_default_audience"
 
     case setFallback = "set_fallback_file"
 
@@ -164,8 +157,6 @@ enum MethodName: String {
 
     case updateCollectingRefundDataConsent = "update_collecting_refund_data_consent"
     case updateRefundPreference = "update_refund_preference"
-
-    case persistOnboardingVariationId = "persist_onboarding_variation_id"
 }
 
 struct XeeSDKMethodRequestParameters: XeeSystemEventParameters {
@@ -216,15 +207,12 @@ struct XeeSDKMethodResponseParameters: XeeSystemEventParameters {
 
 enum AppleMethodName: String {
     case fetchASAToken = "fetch_ASA_Token"
-    case fetchSK1Products = "fetch_sk1_products"
     case fetchSK2Products = "fetch_sk2_products"
 
     case getAllSK2Transactions = "get_all_sk2_transactions"
     case getSK2CurrentEntitlements = "get_sk2_current_entitlements"
     case getUnfinishedSK2Transactions = "get_unfinished_sk2_transactions"
 
-    case getReceipt = "get_receipt"
-    case refreshReceipt = "refresh_receipt"
 
     case finishTransaction = "finish_transaction"
     case addPayment = "add_payment"

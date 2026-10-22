@@ -11,21 +11,11 @@ import Foundation
 extension XeePaywall {
     struct Variation: Sendable, Decodable {
         let variationId: String
-        let variationIdByPaywalls: [String: String]
         let weight: Int
 
         enum CodingKeys: String, CodingKey {
             case variationId = "variation_id"
             case weight
-            case crossPaywallInfo = "cross_paywall_info"
-        }
-
-        private enum CrossPaywallCodingKeys: String, CodingKey {
-            case variationIdByPaywalls = "paywall_with_variation_map"
-        }
-
-        var isCrossPaywallTest: Bool {
-            variationIdByPaywalls.isNotEmpty
         }
 
         init(from decoder: Decoder) throws {
@@ -40,15 +30,6 @@ extension XeePaywall {
 
             variationId = try container.decode(String.self, forKey: .variationId)
             weight = try container.decode(Int.self, forKey: .weight)
-
-            if container.contains(.crossPaywallInfo),
-               !((try? container.decodeNil(forKey: .crossPaywallInfo)) ?? true)
-            {
-                let crossPaywallInfo = try container.nestedContainer(keyedBy: CrossPaywallCodingKeys.self, forKey: .crossPaywallInfo)
-                variationIdByPaywalls = try crossPaywallInfo.decode([String: String].self, forKey: .variationIdByPaywalls)
-            } else {
-                variationIdByPaywalls = [:]
-            }
         }
     }
 }

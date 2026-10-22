@@ -10,9 +10,6 @@ import StoreKit
 
 public protocol XeeProduct: Sendable, CustomStringConvertible {
     /// Underlying system representation of the product.
-    var sk1Product: StoreKit.SKProduct? { get }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     var sk2Product: StoreKit.Product? { get }
 
     /// Unique identifier of a product from App Store Connect or Google Play Console.

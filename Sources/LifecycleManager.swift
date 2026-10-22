@@ -22,10 +22,6 @@ final class LifecycleManager {
         static let profileUpdateInterval: TimeInterval = 60.0
         static let profileUpdateShortInterval: TimeInterval = 10.0
 
-        static let profileUpdateAcceleratedInterval: TimeInterval = 3.0
-        static let profileUpdateAcceleratedMaxCooldownAfterOpenWeb: TimeInterval = 60.0 * 20.0
-        static let profileUpdateAcceleratedDuration: TimeInterval = 60.0 * 5.0
-
         static let idfaStatusCheckDuration: TimeInterval = 600.0
         static let idfaStatusCheckInterval: TimeInterval = 5.0
     }
@@ -58,41 +54,6 @@ final class LifecycleManager {
 
     private var profileIsSyncing = false
 
-    private static func calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: TimeInterval, logStamp stamp: String) -> TimeInterval {
-        guard let storage = Xee.optionalSDK?.profileStorage else { return defaultValue }
-
-        let now = Date()
-
-        guard let lastOpenedWebPaywallVariantAt = storage.lastOpenedWebPaywallVariantDate() else {
-            log.debug("LifecycleManager: \(stamp) calculateInterval: NO WEB PAYWALL")
-            return defaultValue
-        }
-
-        if let lastStartAcceleratedSyncAt = storage.lastStartAcceleratedSyncProfileDate(), lastStartAcceleratedSyncAt > lastOpenedWebPaywallVariantAt {
-            let timeLeft = now.timeIntervalSince(lastStartAcceleratedSyncAt)
-
-            if timeLeft < Constants.profileUpdateAcceleratedDuration {
-                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeft) < \(Constants.profileUpdateAcceleratedDuration) (last start)")
-                return Constants.profileUpdateAcceleratedInterval
-            } else {
-                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeft) >= \(Constants.profileUpdateAcceleratedDuration) (last start)")
-                return defaultValue
-            }
-        } else {
-            let timeLeftFromLastOpenedWebPaywallVariant = now.timeIntervalSince(lastOpenedWebPaywallVariantAt)
-
-            guard timeLeftFromLastOpenedWebPaywallVariant < Constants.profileUpdateAcceleratedMaxCooldownAfterOpenWeb else {
-                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeftFromLastOpenedWebPaywallVariant) >= \(Constants.profileUpdateAcceleratedMaxCooldownAfterOpenWeb) (cooldown)")
-                return defaultValue
-            }
-
-            log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeftFromLastOpenedWebPaywallVariant) < \(Constants.profileUpdateAcceleratedMaxCooldownAfterOpenWeb) (cooldown) -> STORE TIME")
-
-            storage.setLastStartAcceleratedSyncProfileDate()
-            return Constants.profileUpdateAcceleratedInterval
-        }
-    }
-
     private func scheduleProfileUpdate(skipFirstSleep: Bool) -> Task<Void, Error> {
         let stamp = Log.stamp
 
@@ -104,17 +65,16 @@ final class LifecycleManager {
             }
 
             while !Task.isCancelled {
-                let defaultUpdateInterval: TimeInterval
+                let updateInterval: TimeInterval
 
                 do {
                     try await self?.syncProfile(logStamp: stamp)
-                    defaultUpdateInterval = Constants.profileUpdateInterval
+                    updateInterval = Constants.profileUpdateInterval
                 } catch {
                     log.warn("LifecycleManager: \(stamp) syncProfile Error: \(error)")
-                    defaultUpdateInterval = Constants.profileUpdateShortInterval
+                    updateInterval = Constants.profileUpdateShortInterval
                 }
 
-                let updateInterval = Self.calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: defaultUpdateInterval, logStamp: stamp)
                 log.debug("LifecycleManager: \(stamp) update after: \(updateInterval) sec.")
                 try await Task.sleep(seconds: updateInterval)
             }
@@ -137,36 +97,6 @@ final class LifecycleManager {
         } else {
             log.verbose("LifecycleManager: \(stamp) syncProfile")
             _ = try await Xee.getProfile()
-        }
-    }
-
-    private var crossABIsSyncing = false
-
-    private func syncCrossABState() async throws {
-        guard !crossABIsSyncing else { return }
-
-        defer { crossABIsSyncing = false }
-        crossABIsSyncing = true
-
-        log.verbose("LifecycleManager: syncCrossPaywallState START")
-
-        for attempt in 0 ..< 3 {
-            if attempt > 0 {
-                try await Task.sleep(nanoseconds: 1_000_000)
-            }
-
-            guard let profileManager = Xee.optionalSDK?.profileManager else {
-                log.verbose("LifecycleManager: syncCrossPaywallState (\(attempt)) SKIP")
-                return
-            }
-
-            do {
-                try await profileManager.syncCrossPaywallState()
-                log.verbose("LifecycleManager: syncCrossPaywallState (\(attempt)) SUCCESS")
-                break
-            } catch {
-                log.verbose("LifecycleManager: syncCrossPaywallState (\(attempt)) ERROR: \(error)")
-            }
         }
     }
 
@@ -207,8 +137,6 @@ final class LifecycleManager {
                 try? await Xee.trackEvent(.appOpened)
             }
             log.verbose("handleDidBecomeActiveNotification track")
-
-            try? await syncCrossABState()
         }
     }
 

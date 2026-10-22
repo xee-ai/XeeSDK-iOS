@@ -40,23 +40,18 @@ import Testing
         #expect(HTTPHeaders().setPaywallVersion(nil)["xee-paywall-version"] == nil)
     }
 
-    @Test func bothPaywallFetchesSendTheBundledVersion() {
+    @Test func thePaywallFetchSendsTheBundledVersion() {
         XeePaywallVersions.setForTesting(["main": 4])
         defer { XeePaywallVersions.setForTesting(nil) }
         let user = XeeUserId(profileId: "33333333-cccc-4ccc-8ccc-333333333333", customerId: nil)
-        let variant = FetchPaywallVariantRequest(
-            apiKeyPrefix: "k", userId: user, paywallId: "main", variationId: "main.v4",
-            locale: .defaultPaywallLocale, disableServerCache: false
-        )
         let variants = FetchPaywallVariantsRequest(
             apiKeyPrefix: "k", userId: user, paywallId: "main", locale: .defaultPaywallLocale,
-            segmentId: "s", crossPaywallEligible: false, disableServerCache: false
+            segmentId: "s", disableServerCache: false
         )
-        #expect(variant.headers["xee-paywall-version"] == "4")
         #expect(variants.headers["xee-paywall-version"] == "4")
         let unbundled = FetchPaywallVariantsRequest(
             apiKeyPrefix: "k", userId: user, paywallId: "other", locale: .defaultPaywallLocale,
-            segmentId: "s", crossPaywallEligible: false, disableServerCache: false
+            segmentId: "s", disableServerCache: false
         )
         #expect(unbundled.headers["xee-paywall-version"] == nil, "no bundled version, no header")
     }

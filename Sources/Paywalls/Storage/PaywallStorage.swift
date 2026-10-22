@@ -15,8 +15,6 @@ final class PaywallStorage {
     private static func getPaywall<Content: PaywallContent>(_ paywallId: String) -> VH<Content>? {
         if Content.self == XeePaywallVariant.self {
             return PaywallVariantStorage.paywallVariantByPaywallId[paywallId] as? VH<Content>
-        } else if Content.self == XeeOnboarding.self {
-            return OnboardingStorage.onboardingByPaywallId[paywallId] as? VH<Content>
         } else {
             return nil
         }
@@ -25,8 +23,6 @@ final class PaywallStorage {
     private static func setPaywall(_ content: some PaywallContent) {
         if let paywallVariant = content as? XeePaywallVariant {
             PaywallVariantStorage.setPaywallVariant(paywallVariant)
-        } else if let onboarding = content as? XeeOnboarding {
-            OnboardingStorage.setOnboarding(onboarding)
         } else {
             return
         }
@@ -90,6 +86,5 @@ final class PaywallStorage {
 
     static func clear() {
         PaywallVariantStorage.clear()
-        OnboardingStorage.clear()
     }
 }

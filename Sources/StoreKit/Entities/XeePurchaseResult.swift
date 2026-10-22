@@ -52,16 +52,6 @@ public enum XeePurchaseResult: Sendable {
         return profile
     }
 
-    /// A transaction object, which represents the payment.
-    public var sk1Transaction: SKPaymentTransaction? {
-        guard case let .success(_, transaction) = self,
-              let sk1Transaction = transaction as? SK1Transaction
-        else {
-            return nil
-        }
-        return sk1Transaction
-    }
-
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     public var sk2SignedTransaction: VerificationResult<Transaction>? {
         guard case let .success(_, transaction) = self,

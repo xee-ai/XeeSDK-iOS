@@ -11,8 +11,6 @@ import StoreKit
 enum StoreKitManagerError: Error {
     case interrupted(XeeError.Source)
     case noProductIDsFound(XeeError.Source)
-    case receiptIsEmpty(XeeError.Source, error: Error?)
-    case refreshReceiptFailed(XeeError.Source, error: Error)
     case requestSKProductsFailed(XeeError.Source, error: Error)
     case productPurchaseFailed(XeeError.Source, transactionError: Error?)
     case unknownTransactionId(XeeError.Source)
@@ -29,14 +27,6 @@ extension StoreKitManagerError: CustomStringConvertible {
             "StoreKitManagerError.interrupted(\(source))"
         case let .noProductIDsFound(source):
             "StoreKitManagerError.noProductIDsFound(\(source))"
-        case let .receiptIsEmpty(source, error):
-            if let error {
-                "StoreKitManagerError.receiptIsEmpty(\(source), \(error))"
-            } else {
-                "StoreKitManagerError.receiptIsEmpty(\(source))"
-            }
-        case let .refreshReceiptFailed(source, error):
-            "StoreKitManagerError.refreshReceiptFailed(\(source), \(error))"
         case let .requestSKProductsFailed(source, error):
             "StoreKitManagerError.requestSKProductsFailed(\(source), \(error))"
         case let .productPurchaseFailed(source, error):
@@ -68,8 +58,6 @@ extension StoreKitManagerError {
         switch self {
         case let .productPurchaseFailed(src, _),
              let .noProductIDsFound(src),
-             let .receiptIsEmpty(src, _),
-             let .refreshReceiptFailed(src, _),
              let .requestSKProductsFailed(src, _),
              let .interrupted(src),
              let .unknownTransactionId(src),
@@ -82,11 +70,9 @@ extension StoreKitManagerError {
 
     var originalError: Error? {
         switch self {
-        case let .receiptIsEmpty(_, error),
-             let .productPurchaseFailed(_, error),
+        case let .productPurchaseFailed(_, error),
              let .transactionUnverified(_, error): error
-        case let .refreshReceiptFailed(_, error),
-             let .getSubscriptionInfoStatusFailed(_, error),
+        case let .getSubscriptionInfoStatusFailed(_, error),
              let .requestSKProductsFailed(_, error): error
         default: nil
         }
@@ -122,33 +108,6 @@ extension StoreKitManagerError {
         line: UInt = #line
     ) -> Self {
         .paymentPendingError(XeeError.Source(file: file, function: function, line: line))
-    }
-
-    static func receiptIsEmpty(
-        _ error: Error? = nil,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        .receiptIsEmpty(XeeError.Source(file: file, function: function, line: line), error: error)
-    }
-
-    static func refreshReceiptFailed(
-        _ error: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        .refreshReceiptFailed(XeeError.Source(file: file, function: function, line: line), error: error)
-    }
-
-    static func requestSK1ProductsFailed(
-        _ error: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        .requestSKProductsFailed(XeeError.Source(file: file, function: function, line: line), error: error)
     }
 
     static func requestSK2ProductsFailed(

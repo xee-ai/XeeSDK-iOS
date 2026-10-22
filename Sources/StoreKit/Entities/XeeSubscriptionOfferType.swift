@@ -17,16 +17,6 @@ public enum XeeSubscriptionOfferType: String, Sendable {
 
 extension XeeSubscriptionOfferType: Codable {}
 
-extension SK1Product.SubscriptionOffer.OfferType {
-    var asSubscriptionOfferType: XeeSubscriptionOfferType? {
-        switch self {
-        case .introductory: .introductory
-        case .subscription: .promotional
-        default: nil
-        }
-    }
-}
-
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2Transaction.OfferType {
     var asSubscriptionOfferType: XeeSubscriptionOfferType? {

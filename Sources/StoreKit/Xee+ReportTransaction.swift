@@ -55,8 +55,7 @@ public extension Xee {
                 ),
                 payload: .init(
                     userId: userId,
-                    paywallVariantId: variationId,
-                    persistentOnboardingVariationId: await sdk.purchasePayloadStorage.onboardingVariationId()
+                    paywallVariantId: variationId
                 ),
                 reason: .setVariation
             )

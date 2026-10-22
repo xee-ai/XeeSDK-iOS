@@ -19,8 +19,6 @@ final class ProfileStorage {
         static let externalAnalyticsDisabledKey = "XeeSDK_External_Analytics_Disabled"
         static let syncedTransactionsHistoryKey = "XeeSDK_Synced_Bundle_Receipt"
         static let appleSearchAdsSyncDateKey = "XeeSDK_Apple_Search_Ads_Sync_Date"
-        static let lastOpenedWebPaywallVariantKey = "XeeSDK_Last_Opened_Web_PaywallVariant"
-        static let lastStartAcceleratedSyncProfileKey = "XeeSDK_Last_Start_Accelerated_Sync_Profile"
     }
 
     private static let userDefaults = Storage.userDefaults
@@ -127,24 +125,6 @@ final class ProfileStorage {
         log.debug("set appleSearchAdsSyncDate = \(value).")
     }
 
-    private static var lastOpenedWebPaywallVariantDate: Date? = userDefaults.object(forKey: Constants.lastOpenedWebPaywallVariantKey) as? Date
-
-    private static func setLastOpenedWebPaywallVariantDate(_ value: Date) {
-        guard lastOpenedWebPaywallVariantDate != value else { return }
-        lastOpenedWebPaywallVariantDate = value
-        userDefaults.set(value, forKey: Constants.lastOpenedWebPaywallVariantKey)
-        log.debug("set lastOpenedWebPaywallVariantDate = \(value).")
-    }
-
-    private static var lastStartAcceleratedSyncProfileDate: Date? = userDefaults.object(forKey: Constants.lastStartAcceleratedSyncProfileKey) as? Date
-
-    private static func setLastStartAcceleratedSyncProfileDate(_ value: Date) {
-        guard lastStartAcceleratedSyncProfileDate != value else { return }
-        lastStartAcceleratedSyncProfileDate = value
-        userDefaults.set(value, forKey: Constants.lastStartAcceleratedSyncProfileKey)
-        log.debug("set setLastStartAcceleratedSyncProfileDate = \(value).")
-    }
-
     static func clearProfile(newProfile: VH<XeeProfile>? = nil) {
         log.verbose("Clear profile")
         if let newProfile {
@@ -163,13 +143,7 @@ final class ProfileStorage {
         syncedTransactionsHistory = false
         userDefaults.removeObject(forKey: Constants.appleSearchAdsSyncDateKey)
         appleSearchAdsSyncDate = nil
-        userDefaults.removeObject(forKey: Constants.lastOpenedWebPaywallVariantKey)
-        lastOpenedWebPaywallVariantDate = nil
-        userDefaults.removeObject(forKey: Constants.lastStartAcceleratedSyncProfileKey)
-        lastStartAcceleratedSyncProfileDate = nil
 
-        CrossPaywallStorage.clear()
-        BackendIntroductoryOfferEligibilityStorage.clear()
         PaywallStorage.clear()
     }
 }
@@ -248,23 +222,5 @@ extension ProfileStorage {
     func setAppleSearchAdsSyncDate(for userId: XeeUserId) throws(WrongProfileIdError) {
         try checkProfileId(userId)
         Self.setAppleSearchAdsSyncDate(Date())
-    }
-}
-
-extension ProfileStorage { // TODO: need checkProfileId
-    func lastOpenedWebPaywallVariantDate() -> Date? {
-        Self.lastOpenedWebPaywallVariantDate
-    }
-
-    func setLastOpenedWebPaywallVariantDate() {
-        Self.setLastOpenedWebPaywallVariantDate(Date())
-    }
-
-    func lastStartAcceleratedSyncProfileDate() -> Date? {
-        Self.lastStartAcceleratedSyncProfileDate
-    }
-
-    func setLastStartAcceleratedSyncProfileDate() {
-        Self.setLastStartAcceleratedSyncProfileDate(Date())
     }
 }

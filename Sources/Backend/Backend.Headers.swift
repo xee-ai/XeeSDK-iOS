@@ -13,12 +13,9 @@ extension Backend.Request {
     fileprivate static let hashHeaderKey = "xee-sdk-previous-response-hash"
     fileprivate static let paywallVariantLocaleHeaderKey = "xee-paywall-locale"
     fileprivate static let paywallVersionHeaderKey = "xee-paywall-version"
-    fileprivate static let onboardingLocaleHeaderKey = "xee-onboarding-locale"
     fileprivate static let paywallVariantBuilderLocaleHeaderKey = "xee-paywall-builder-locale"
     fileprivate static let paywallVariantBuilderVersionHeaderKey = "xee-paywall-builder-version"
     fileprivate static let paywallVariantBuilderConfigurationFormatVersionHeaderKey = "xee-paywall-builder-config-format-version"
-    fileprivate static let onboardingUIVersionHeaderKey = "xee-onboarding-ui-version"
-    fileprivate static let crossPaywallEligibilityHeaderKey = "xee-cross-paywall-eligibility"
     fileprivate static let segmentIdHeaderKey = "xee-profile-segment-hash"
 
     fileprivate static let profileIdHeaderKey = "xee-sdk-profile-id"
@@ -80,10 +77,6 @@ extension HTTPHeaders {
         updateOrRemoveValue(version.map(String.init), forKey: Backend.Request.paywallVersionHeaderKey)
     }
 
-    func setOnboardingLocale(_ locale: XeeLocale?) -> Self {
-        updateOrRemoveValue(locale?.id, forKey: Backend.Request.onboardingLocaleHeaderKey)
-    }
-
     func setPaywallVariantBuilderLocale(_ locale: XeeLocale?) -> Self {
         updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallVariantBuilderLocaleHeaderKey)
     }
@@ -94,14 +87,6 @@ extension HTTPHeaders {
 
     func setPaywallVariantBuilderConfigurationFormatVersion(_ version: String?) -> Self {
         updateOrRemoveValue(version, forKey: Backend.Request.paywallVariantBuilderConfigurationFormatVersionHeaderKey)
-    }
-
-    func setOnboardingUIVersion(_ version: String?) -> Self {
-        updateOrRemoveValue(version, forKey: Backend.Request.onboardingUIVersionHeaderKey)
-    }
-
-    func setCrossPaywallEligibility(_ enabled: Bool) -> Self {
-        updateOrRemoveValue(enabled ? "true" : "false", forKey: Backend.Request.crossPaywallEligibilityHeaderKey)
     }
 
     func setSegmentId(_ id: String?) -> Self {

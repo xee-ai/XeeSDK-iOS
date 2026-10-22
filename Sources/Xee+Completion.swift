@@ -144,16 +144,6 @@ public extension Xee {
         }
     }
 
-    nonisolated static func setIntegrationIdentifier(
-        key: String,
-        value: String,
-        _ completion: XeeErrorCompletion? = nil
-    ) {
-        withCompletion(completion) { () async throws(XeeError) in
-            try await setIntegrationIdentifier(key: key, value: value)
-        }
-    }
-
     nonisolated static func getCurrentInstallationStatus(
         _ completion: @escaping XeeResultCompletion<XeeInstallationStatus>
     ) {
@@ -192,23 +182,6 @@ public extension Xee {
         }
     }
 
-    nonisolated static func getOnboarding(
-        paywallId: String,
-        locale: String? = nil,
-        fetchPolicy: XeePaywallFetchPolicy = .default,
-        loadTimeout: TimeInterval? = nil,
-        _ completion: @escaping XeeResultCompletion<XeeOnboarding>
-    ) {
-        withCompletion(completion) { () async throws(XeeError) in
-            try await getOnboarding(
-                paywallId: paywallId,
-                locale: locale,
-                fetchPolicy: fetchPolicy,
-                loadTimeout: loadTimeout
-            )
-        }
-    }
-
     /// This method enables you to retrieve the paywall from the Default Audience without having to wait for the Xee SDK to send all the user information required for segmentation to the server.
     ///
     /// - Parameters:
@@ -227,21 +200,6 @@ public extension Xee {
     ) {
         withCompletion(completion) { () async throws(XeeError) in
             try await getPaywallVariantForDefaultAudience(
-                paywallId: paywallId,
-                locale: locale,
-                fetchPolicy: fetchPolicy
-            )
-        }
-    }
-
-    nonisolated static func getOnboardingForDefaultAudience(
-        paywallId: String,
-        locale: String? = nil,
-        fetchPolicy: XeePaywallFetchPolicy = .default,
-        _ completion: @escaping XeeResultCompletion<XeeOnboarding>
-    ) {
-        withCompletion(completion) { () async throws(XeeError) in
-            try await getOnboardingForDefaultAudience(
                 paywallId: paywallId,
                 locale: locale,
                 fetchPolicy: fetchPolicy
@@ -308,73 +266,12 @@ public extension Xee {
         }
     }
 
-    nonisolated static func openWebPaywallVariant(
-        for product: XeePaywallVariantProduct,
-        in presentation: XeeWebPresentation = .externalBrowser,
-        _ completion: XeeErrorCompletion?
-    ) {
-        withCompletion(completion) { () async throws(XeeError) in
-            try await openWebPaywallVariant(for: product, in: presentation)
-        }
-    }
-
-    nonisolated static func openWebPaywallVariant(
-        for paywallVariant: XeePaywallVariant,
-        in presentation: XeeWebPresentation = .externalBrowser,
-        _ completion: XeeErrorCompletion?
-    ) {
-        withCompletion(completion) { () async throws(XeeError) in
-            try await openWebPaywallVariant(for: paywallVariant, in: presentation)
-        }
-    }
-
-    nonisolated static func createWebPaywallVariantUrl(
-        for product: XeePaywallVariantProduct,
-        _ completion: @escaping XeeResultCompletion<URL>
-    ) {
-        withCompletion(completion) { () async throws(XeeError) in
-            try await createWebPaywallVariantUrl(for: product)
-        }
-    }
-
-    nonisolated static func createWebPaywallVariantUrl(
-        for paywallVariant: XeePaywallVariant,
-        _ completion: @escaping XeeResultCompletion<URL>
-    ) {
-        withCompletion(completion) { () async throws(XeeError) in
-            try await createWebPaywallVariantUrl(for: paywallVariant)
-        }
-    }
-
-    nonisolated static func makePurchase(
-        product: XeeDeferredProduct,
-        _ completion: @escaping XeeResultCompletion<XeePurchaseResult>
-    ) {
-        withCompletion(completion) { () async throws(XeeError) in
-            try await makePurchase(product: product)
-        }
-    }
-
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     static func getUnfinishedTransactions(
         _ completion: @escaping XeeResultCompletion<[XeeUnfinishedTransaction]>
     ) {
         withCompletion(completion) { () async throws(XeeError) in
             try await getUnfinishedTransactions()
-        }
-    }
-
-    /// You can fetch the StoreKit receipt by calling this method
-    ///
-    /// If the receipt is not presented on the device, Xee will try to refresh it by using [SKReceiptRefreshRequest](https://developer.apple.com/documentation/storekit/skreceiptrefreshrequest)
-    ///
-    /// - Parameters:
-    ///   - completion: A result containing the receipt `Data`.
-    nonisolated static func getReceipt(
-        _ completion: @escaping XeeResultCompletion<Data>
-    ) {
-        withCompletion(completion) { () async throws(XeeError) in
-            try await getReceipt()
         }
     }
 

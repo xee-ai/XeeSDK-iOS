@@ -47,8 +47,7 @@ private func productRow(_ product: XeePaywallVariantProduct) {
     let unit = product.subscriptionPeriod?.unit       // .day, .week, .month or .year
     let count = product.subscriptionPeriod?.numberOfUnits
     let locale = product.priceLocale                  // the storefront's locale
-    let storeKit2 = product.sk2Product                // StoreKit 2 Product, iOS 15 and later
-    let storeKit1 = product.sk1Product                // StoreKit 1 SKProduct, iOS 14 and earlier
+    let storeKit2 = product.sk2Product                // the StoreKit 2 Product
 
     // The intro offer, set only when this user is eligible for it.
     if let offer = product.subscriptionOffer,

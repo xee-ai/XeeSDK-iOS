@@ -13,18 +13,15 @@ private let log = Log.sk2TransactionManager
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2Purchaser {
     private let transactionSynchronizer: StoreKitTransactionSynchronizer
-    private let subscriptionOfferSigner: StoreKitSubscriptionOfferSigner
     private let storage: PurchasePayloadStorage
     private let sk2ProductManager: SK2ProductsManager
     
     private init(
         transactionSynchronizer: StoreKitTransactionSynchronizer,
-        subscriptionOfferSigner: StoreKitSubscriptionOfferSigner,
         storage: PurchasePayloadStorage,
         sk2ProductManager: SK2ProductsManager
     ) {
         self.transactionSynchronizer = transactionSynchronizer
-        self.subscriptionOfferSigner = subscriptionOfferSigner
         self.storage = storage
         self.sk2ProductManager = sk2ProductManager
     }
@@ -35,7 +32,6 @@ actor SK2Purchaser {
     @XeeActor
     static func startObserving(
         transactionSynchronizer: StoreKitTransactionSynchronizer,
-        subscriptionOfferSigner: StoreKitSubscriptionOfferSigner,
         sk2ProductsManager: SK2ProductsManager,
         storage: PurchasePayloadStorage
     ) -> SK2Purchaser? {
@@ -97,7 +93,6 @@ actor SK2Purchaser {
         
         return SK2Purchaser(
             transactionSynchronizer: transactionSynchronizer,
-            subscriptionOfferSigner: subscriptionOfferSigner,
             storage: storage,
             sk2ProductManager: sk2ProductsManager
         )
@@ -123,23 +118,9 @@ actor SK2Purchaser {
         if let offer = product.subscriptionOffer {
             switch offer.offerIdentifier {
             case let .promotional(offerId):
-                let response = try await subscriptionOfferSigner.sign(
-                    offerId: offerId,
-                    subscriptionVendorId: product.vendorProductId,
-                    for: userId,
-                    with: appAccountToken
-                )
-                
-                options.insert(
-                    .promotionalOffer(
-                        offerID: offerId,
-                        keyID: response.keyIdentifier,
-                        nonce: response.nonce,
-                        signature: response.signature,
-                        timestamp: response.timestamp
-                    )
-                )
-                
+                // Promotional offers need a server signature, and Xee does not sign offers.
+                throw StoreKitManagerError.invalidOffer("Promotional offers are not supported: offerId:\(offerId) for productId: \(product.vendorProductId)").asXeeError
+
             case let .winBack(offerId):
                 if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
                    let winBackOffer = product.skProduct.sk2ProductSubscriptionOffer(by: .winBack(offerId))
@@ -159,8 +140,7 @@ actor SK2Purchaser {
         let payload = PurchasePayload(
             userId: userId,
             paywallVariantId: product.variationId,
-            persistentPaywallVariantId: product.variationId,
-            persistentOnboardingVariationId: await storage.onboardingVariationId()
+            persistentPaywallVariantId: product.variationId
         )
         return try await makePurchase(product.skProduct, options, payload, for: userId)
     }

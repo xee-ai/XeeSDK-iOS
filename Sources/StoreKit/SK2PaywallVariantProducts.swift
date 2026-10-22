@@ -33,47 +33,9 @@ extension Xee {
                 paywallVariantProductIndex: reference.paywallVariantProductIndex,
                 variationId: paywallVariant.variationId,
                 paywallVariantABTestName: paywallVariant.paywall.abTestName,
-                paywallVariantName: paywallVariant.name,
-                webPaywallVariantBaseUrl: paywallVariant.webPaywallVariantBaseUrl
+                paywallVariantName: paywallVariant.name
             )
         }
-    }
-
-    func getSK2PaywallVariantProduct(
-        xeeProductId: String,
-        productInfo: BackendProductInfo,
-        paywallVariantProductIndex: Int,
-        subscriptionOfferIdentifier: XeeSubscriptionOffer.Identifier?,
-        variationId: String,
-        paywallVariantABTestName: String,
-        paywallVariantName: String,
-        webPaywallVariantBaseUrl: URL?,
-        productsManager: SK2ProductsManager
-    ) async throws(XeeError) -> XeeSK2PaywallVariantProduct {
-        let sk2Product = try await productsManager.fetchSK2Product(id: productInfo.vendorId, fetchPolicy: .returnCacheDataElseLoad)
-
-        let subscriptionOffer: XeeSubscriptionOffer? =
-            if let subscriptionOfferIdentifier {
-                if let offer = sk2Product.subscriptionOffer(by: subscriptionOfferIdentifier) {
-                    offer
-                } else {
-                    throw StoreKitManagerError.invalidOffer("StoreKit2 product don't have offer id: `\(subscriptionOfferIdentifier.offerId ?? "nil")` with type:\(subscriptionOfferIdentifier.offerType.rawValue) ").asXeeError
-                }
-            } else {
-                nil
-            }
-
-        return XeeSK2PaywallVariantProduct(
-            skProduct: sk2Product,
-            xeeProductId: xeeProductId,
-            productInfo: productInfo,
-            paywallVariantProductIndex: paywallVariantProductIndex,
-            subscriptionOffer: subscriptionOffer,
-            variationId: variationId,
-            paywallVariantABTestName: paywallVariantABTestName,
-            paywallVariantName: paywallVariantName,
-            webPaywallVariantBaseUrl: webPaywallVariantBaseUrl
-        )
     }
 
     func getSK2PaywallVariantProducts(
@@ -117,8 +79,7 @@ extension Xee {
                 subscriptionOffer: $0.offer,
                 variationId: paywallVariant.variationId,
                 paywallVariantABTestName: paywallVariant.paywall.abTestName,
-                paywallVariantName: paywallVariant.name,
-                webPaywallVariantBaseUrl: paywallVariant.webPaywallVariantBaseUrl
+                paywallVariantName: paywallVariant.name
             )
         }
     }

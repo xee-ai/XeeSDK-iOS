@@ -14,10 +14,6 @@ protocol StoreKitTransactionManager: Actor, Sendable {
     func syncUnfinishedTransactions()  async throws(XeeError)
 }
 
-extension StoreKitReceiptManager: StoreKitTransactionManager {
-    func syncUnfinishedTransactions()  async throws(XeeError) {}
-}
-
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2TransactionManager: StoreKitTransactionManager {}
 

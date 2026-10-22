@@ -44,7 +44,6 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
 
         case vendorProductId = "vendor_product_id"
         case persistentPaywallVariantId = "variation_id_persistent"
-        case persistentOnboardingVariationId = "onboarding_variation_id"
         case originalPrice = "original_price"
         case discountPrice = "discount_price"
         case priceLocale = "price_locale"
@@ -100,7 +99,6 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
 
             try container.encodeIfPresent(payload.paywallVariantId, forKey: .paywallVariantId)
             try container.encodeIfPresent(payload.persistentPaywallVariantId, forKey: .persistentPaywallVariantId)
-            try container.encodeIfPresent(payload.persistentOnboardingVariationId, forKey: .persistentOnboardingVariationId)
         }
     }
 
@@ -176,7 +174,6 @@ extension Backend.MainExecutor {
                 "transaction_id": transactionInfo.transactionId,
                 "variation_id": payload.paywallVariantId,
                 "variation_id_persistent": payload.persistentPaywallVariantId,
-                "onboarding_variation_id": payload.persistentOnboardingVariationId,
                 "promotional_offer_id": transactionInfo.subscriptionOffer?.id,
                 "environment": transactionInfo.environment,
                 "request_source": reason.rawString,

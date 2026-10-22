@@ -12,15 +12,6 @@ public protocol XeeDelegate: AnyObject, Sendable {
     /// Implement this delegate method to receive automatic profile updates
     func didLoadLatestProfile(_ profile: XeeProfile)
 
-    /// Implement this delegate method to handle a [user initiated an in-app purchases](https://developer.apple.com/documentation/storekit/skpaymenttransactionobserver/2877502-paymentqueue) from the App Store.
-    /// The default implementation returns `true`.
-    ///
-    /// Return `true` to continue the transaction in your app.
-    /// Return `false` to defer or cancel the transaction.
-    ///
-    /// If you return `false`, you can continue the transaction later by manually calling the `defermentCompletion`.
-    func shouldAddStorePayment(for product: XeeDeferredProduct) -> Bool
-
     func onInstallationDetailsSuccess(_ details: XeeInstallationDetails)
 
     func onInstallationDetailsFail(error: XeeError)
@@ -30,7 +21,6 @@ public protocol XeeDelegate: AnyObject, Sendable {
 }
 
 public extension XeeDelegate {
-    func shouldAddStorePayment(for _: XeeDeferredProduct) -> Bool { true }
     func onInstallationDetailsSuccess(_ details: XeeInstallationDetails) {}
     func onInstallationDetailsFail(error: XeeError) {}
 

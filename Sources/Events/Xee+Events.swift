@@ -91,14 +91,6 @@ extension Xee {
 
             Log.crossAB.verbose("-> trackEvent paywallVariantAssigned variationId = \(paywallVariant.variationId)")
 
-        } else if let onboarding = draw.content as? XeeOnboarding {
-            event = .onboardingVariationAssigned(.init(
-                variationId: onboarding.variationId,
-                paywallAudienceVersionId: draw.paywallAudienceVersionId
-            ))
-
-            Log.crossAB.verbose("-> trackEvent onboardingVariationAssigned variationId = \(onboarding.variationId)")
-
         } else {
             Log.crossAB.warn("-> Warnning: unknown content type for variationAssigned event, variationId = \(draw.content.variationId)")
             return

@@ -9,14 +9,6 @@
 import StoreKit
 
 extension Locale {
-    @inlinable
-    func localized(sk1Price price: NSDecimalNumber) -> String? {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = self
-        return formatter.string(from: price)
-    }
-
     func localized(period: XeeSubscriptionPeriod, numberOfPeriods: Int = 1) -> String? {
         let countUnits = period.numberOfUnits * numberOfPeriods
         switch period.unit {

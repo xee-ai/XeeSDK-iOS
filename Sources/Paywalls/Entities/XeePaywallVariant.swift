@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct XeePaywallVariant: PaywallContent, WebPaywallVariantURLProviding {
+public struct XeePaywallVariant: PaywallContent {
     public let paywall: XeePaywall
 
     public let instanceIdentity: String
@@ -22,8 +22,6 @@ public struct XeePaywallVariant: PaywallContent, WebPaywallVariantURLProviding {
     public let remoteConfig: XeeRemoteConfig?
 
     let products: [ProductReference]
-
-    package var webPaywallVariantBaseUrl: URL?
 
     /// Array of related products ids.
     public var vendorProductIds: [String] { products.map { $0.productInfo.vendorId } }
@@ -45,7 +43,6 @@ extension XeePaywallVariant: Codable {
         case variationId = "variation_id"
         case name = "paywall_variant_name"
         case remoteConfig = "remote_config"
-        case webPaywallVariantBaseUrl = "web_purchase_url"
         case products
         case requestLocale = "request_locale"
     }
@@ -66,7 +63,6 @@ extension XeePaywallVariant: Codable {
         name = try container.decode(String.self, forKey: .name)
         variationId = try container.decode(String.self, forKey: .variationId)
         remoteConfig = try container.decodeIfPresent(XeeRemoteConfig.self, forKey: .remoteConfig)
-        webPaywallVariantBaseUrl = try container.decodeIfPresent(URL.self, forKey: .webPaywallVariantBaseUrl)
 
         products = try {
             var arrayContainer = try container.nestedUnkeyedContainer(forKey: .products)
@@ -95,7 +91,6 @@ extension XeePaywallVariant: Codable {
         try container.encode(variationId, forKey: .variationId)
         try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)
         try container.encode(products, forKey: .products)
-        try container.encodeIfPresent(webPaywallVariantBaseUrl, forKey: .webPaywallVariantBaseUrl)
         try container.encode(requestLocale, forKey: .requestLocale)
         try paywall.encode(to: encoder)
     }

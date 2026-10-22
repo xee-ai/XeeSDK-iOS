@@ -7,6 +7,5 @@
 //
 
 enum PaywallDecodingError: Error, Hashable, Codable {
-    case crossPaywallABTestDisabled
     case notFoundVariationId
 }

@@ -22,7 +22,6 @@ final class PurchasePayloadStorage {
         static let purchasePayloadByProductId = "XeeSDK_Purchase_Payload_By_Product"
         static let purchasePayloadByTransactionId = "XeeSDK_Purchase_Payload_By_Transaction"
         static let persistentPaywallVariantsIds = "XeeSDK_Variations_Ids"
-        static let persistentOnboardingVariationsId = "XeeSDK_Onboarding_Variation_Id"
         static let unfinishedTransactionState = "XeeSDK_Unfinished_Transaction_State"
     }
 
@@ -69,15 +68,6 @@ final class PurchasePayloadStorage {
         return true
     }
 
-    private static var persistentOnboardingVariationsId: String? = userDefaults.string(forKey: Constants.persistentOnboardingVariationsId)
-
-    private static func setPersistentOnboardingVariationId(_ variationId: String) -> Bool {
-        guard variationId != persistentOnboardingVariationsId else { return false }
-        persistentOnboardingVariationsId = variationId
-        userDefaults.set(persistentOnboardingVariationsId, forKey: Constants.persistentOnboardingVariationsId)
-        return true
-    }
-
     private static var unfinishedTransactionState: [String: Bool] = userDefaults
         .dictionary(forKey: Constants.unfinishedTransactionState) as? [String: Bool] ?? [:]
 
@@ -114,14 +104,11 @@ final class PurchasePayloadStorage {
 
         guard let paywallVariantsIds, !paywallVariantsIds.isEmpty else { return }
 
-        let onboardingId = userDefaults.string(forKey: Constants.persistentOnboardingVariationsId)
-
         let payloads = paywallVariantsIds.mapValues { variationId in
             PurchasePayload(
                 userId: userId,
                 paywallVariantId: variationId,
-                persistentPaywallVariantId: variationId,
-                persistentOnboardingVariationId: onboardingId
+                persistentPaywallVariantId: variationId
             )
         }
 
@@ -136,16 +123,14 @@ final class PurchasePayloadStorage {
 
     static func clear() {
         purchasePayloadByProductId = [:]
-        persistentOnboardingVariationsId = nil
 
         userDefaults.removeObject(forKey: Constants.deprecatedPaywallVariantsIds)
         userDefaults.removeObject(forKey: Constants.persistentPaywallVariantsIds)
         userDefaults.removeObject(forKey: Constants.purchasePayloadByProductId)
         userDefaults.removeObject(forKey: Constants.purchasePayloadByTransactionId)
-        userDefaults.removeObject(forKey: Constants.persistentOnboardingVariationsId)
         userDefaults.removeObject(forKey: Constants.unfinishedTransactionState)
 
-        log.debug("Clear variationsIds for paywallVariants and onboarding.")
+        log.debug("Clear variationsIds for paywallVariants.")
     }
 }
 
@@ -153,8 +138,7 @@ extension PurchasePayloadStorage {
     func purchasePayload(byProductId productId: String, orCreateFor userId: XeeUserId) -> PurchasePayload {
         Self.purchasePayloadByProductId[productId] ?? .init(
             userId: userId,
-            persistentPaywallVariantId: Self.persistentPaywallVariantsIds[productId],
-            persistentOnboardingVariationId: Self.persistentOnboardingVariationsId
+            persistentPaywallVariantId: Self.persistentPaywallVariantsIds[productId]
         )
     }
 
@@ -163,8 +147,7 @@ extension PurchasePayloadStorage {
             .init(
                 userId: userId,
                 paywallVariantId: variationId,
-                persistentPaywallVariantId: variationId,
-                persistentOnboardingVariationId: Self.persistentOnboardingVariationsId
+                persistentPaywallVariantId: variationId
             ),
             forProductId: productId
         ) {
@@ -231,19 +214,6 @@ extension PurchasePayloadStorage {
             ))
         }
         removePurchasePayload(forProductId: transaction.unfProductId)
-    }
-
-    func onboardingVariationId() -> String? { Self.persistentOnboardingVariationsId }
-
-    func setOnboardingVariationId(_ variationId: String) {
-        if Self.setPersistentOnboardingVariationId(variationId) {
-            Xee.trackSystemEvent(XeeInternalEventParameters(
-                eventName: "did_set_onboarding_variations_id",
-                params: [
-                    "onboarding_variation_id": variationId,
-                ]
-            ))
-        }
     }
 
     func unfinishedTransactionIds() -> Set<String> {

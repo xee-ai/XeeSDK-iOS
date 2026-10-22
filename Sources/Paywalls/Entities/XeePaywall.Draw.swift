@@ -13,12 +13,7 @@ extension XeePaywall {
         let userId: XeeUserId
         var content: Content
         let paywallAudienceVersionId: String
-        let variationIdByPaywalls: [String: String]
     }
-}
-
-extension XeePaywall.Draw {
-    var participatesInCrossPaywallABTest: Bool { variationIdByPaywalls.isNotEmpty }
 }
 
 extension XeePaywall.Draw: Decodable {
@@ -50,15 +45,12 @@ extension XeePaywall.Draw: Decodable {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Paywall content with index \(index) not found"))
         }
 
-        let variation = variations[index]
-
         let content = try Self.content(from: decoder, index: index)
 
         self.init(
             userId: userId,
             content: content,
-            paywallAudienceVersionId: paywallAudienceVersionId,
-            variationIdByPaywalls: variation.variationIdByPaywalls
+            paywallAudienceVersionId: paywallAudienceVersionId
         )
     }
 

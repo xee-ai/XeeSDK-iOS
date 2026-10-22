@@ -12,8 +12,6 @@ enum Event: Sendable {
     case appOpened
     case paywallShowed(XeePaywallShowedParameters)
     case paywallVariantAssigned(XeePaywallVariantAssignedParameters)
-    case onboardingVariationAssigned(XeeOnboardingVariationAssignedParameters)
-    case onboardingScreenShowed(XeeUIOnboardingScreenShowedParameters)
     case сonsentToCollectingRefundData(XeeConsentToCollectingDataParameters)
     case refundPreference(XeeRefundPreferenceParameters)
     case activity(XeeActivityParameters)
@@ -38,10 +36,6 @@ extension Event: Encodable {
         case let .paywallShowed(value):
             try value.encode(to: encoder)
         case let .paywallVariantAssigned(value):
-            try value.encode(to: encoder)
-        case let .onboardingVariationAssigned(value):
-            try value.encode(to: encoder)
-        case let .onboardingScreenShowed(value):
             try value.encode(to: encoder)
         case let .сonsentToCollectingRefundData(value):
             try value.encode(to: encoder)

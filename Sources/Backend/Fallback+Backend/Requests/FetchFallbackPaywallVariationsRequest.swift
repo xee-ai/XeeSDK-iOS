@@ -46,27 +46,14 @@ private extension BackendExecutor {
         locale: XeeLocale,
         requestLocale: XeeLocale,
         cached: Content?,
-        crossPaywallEligible: Bool,
-        variationIdResolver: XeePaywallChosen<Content>.VariationIdResolver?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> XeePaywallChosen<Content> {
-        let endpoint: HTTPEndpoint
-        let requestName: BackendRequestName
-        if Content.self == XeePaywallVariant.self {
-            endpoint = HTTPEndpoint(
-                method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(paywallId)/app_store/\(locale.languageCode.lowercased())/\(Xee.uiBuilderVersion)/fallback.json"
-            )
-            requestName = kind == .fallback ? .fetchFallbackPaywallVariants : .fetchPaywallVariantsForDefaultAudience
-
-        } else {
-            endpoint = HTTPEndpoint(
-                method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(paywallId)/\(locale.languageCode.lowercased())/fallback.json"
-            )
-            requestName = kind == .fallback ? .fetchFallbackOnboardingVariations : .fetchOnboardingVariationsForDefaultAudience
-        }
+        let endpoint = HTTPEndpoint(
+            method: .get,
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(paywallId)/app_store/\(locale.languageCode.lowercased())/\(Xee.uiBuilderVersion)/fallback.json"
+        )
+        let requestName: BackendRequestName = kind == .fallback ? .fetchFallbackPaywallVariants : .fetchPaywallVariantsForDefaultAudience
 
         let request = FetchFallbackPaywallVariationsRequest(
             endpoint: endpoint,
@@ -91,8 +78,7 @@ private extension BackendExecutor {
                 withUserId: userId,
                 withPaywallId: paywallId,
                 withRequestLocale: requestLocale,
-                withCached: cached,
-                variationIdResolver: variationIdResolver
+                withCached: cached
             ))
 
             return response.body
@@ -111,8 +97,6 @@ private extension BackendExecutor {
                 locale: .defaultPaywallLocale,
                 requestLocale: requestLocale,
                 cached: cached,
-                crossPaywallEligible: crossPaywallEligible,
-                variationIdResolver: variationIdResolver,
                 disableServerCache: disableServerCache,
                 timeoutInterval: timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)
             )
@@ -127,8 +111,6 @@ extension Backend.FallbackExecutor {
         paywallId: String,
         locale: XeeLocale,
         cached: Content?,
-        crossPaywallEligible: Bool,
-        variationIdResolver: XeePaywallChosen<Content>.VariationIdResolver?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> XeePaywallChosen<Content> {
@@ -139,8 +121,6 @@ extension Backend.FallbackExecutor {
             locale: locale,
             requestLocale: locale,
             cached: cached,
-            crossPaywallEligible: crossPaywallEligible,
-            variationIdResolver: variationIdResolver,
             disableServerCache: disableServerCache,
             timeoutInterval: timeoutInterval
         )
@@ -154,8 +134,6 @@ extension Backend.ConfigsExecutor {
         paywallId: String,
         locale: XeeLocale,
         cached: Content?,
-        crossPaywallEligible: Bool,
-        variationIdResolver: XeePaywallChosen<Content>.VariationIdResolver?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> XeePaywallChosen<Content> {
@@ -166,8 +144,6 @@ extension Backend.ConfigsExecutor {
             locale: locale,
             requestLocale: locale,
             cached: cached,
-            crossPaywallEligible: crossPaywallEligible,
-            variationIdResolver: variationIdResolver,
             disableServerCache: disableServerCache,
             timeoutInterval: timeoutInterval
         )

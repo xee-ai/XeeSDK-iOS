@@ -197,14 +197,6 @@ extension XeeError {
         InternalXeeError.wrongParam(XeeError.Source(file: file, function: function, line: line), "Transaction is not in \"purchased\" state").asXeeError
     }
 
-    static func wrongParamOnboardingScreenOrder(
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalXeeError.wrongParam(XeeError.Source(file: file, function: function, line: line), "Wrong screenOrder parameter value, it should be more than zero.").asXeeError
-    }
-
     static func wrongKeyOfCustomAttribute(
         file: String = #fileID,
         function: String = #function,
@@ -262,24 +254,6 @@ extension XeeError {
         line: UInt = #line
     ) -> Self {
         InternalXeeError.wrongParam(XeeError.Source(file: file, function: function, line: line), "Current method is not available for the product:\(xeeProductId)").asXeeError
-    }
-
-    static func failedDecodingWebPaywallVariantUrl(
-        url: URL,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalXeeError.decodingFailed(XeeError.Source(file: file, function: function, line: line), "Failed decoding web paywall url:\(url)", error: URLError(.badURL)).asXeeError
-    }
-
-    static func failedOpeningWebPaywallVariantUrl(
-        _ url: URL,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalXeeError.wrongParam(XeeError.Source(file: file, function: function, line: line), "Failed opening web paywall url: \(url)").asXeeError
     }
 
     static func unknown(

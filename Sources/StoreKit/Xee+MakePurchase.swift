@@ -57,41 +57,6 @@ public extension Xee {
         }
     }
 
-    /// To make the purchase, you have to call this method.
-    ///
-    /// Read more on the [Xee Documentation](https://xee.invalid/docs)
-    ///
-    /// - Parameters:
-    ///   - product: a ``XeeDeferredProduct`` object retrieved from the delegate.
-    /// - Returns: The ``XeePurchaseResult`` object.
-    /// - Throws: An ``XeeError`` object
-    nonisolated static func makePurchase(
-        product: XeeDeferredProduct
-    ) async throws(XeeError) -> XeePurchaseResult {
-        do {
-            let result = try await purchase(product: product)
-            trackPurchase(result, productId: product.vendorProductId, variationId: nil)
-            return result
-        } catch {
-            trackActivity(.purchase, .failed, productId: product.vendorProductId, error: error)
-            throw error
-        }
-    }
-
-    private nonisolated static func purchase(
-        product: XeeDeferredProduct
-    ) async throws(XeeError) -> XeePurchaseResult {
-        try await withActivatedSDK(
-            methodName: .makePurchase,
-            logParams: [
-                "product_id": product.vendorProductId,
-            ]
-        ) { sdk throws(XeeError) in
-            guard let manager = sdk.sk1QueueManager else { throw .cantMakePayments() }
-            return try await manager.makePurchase(product: product)
-        }
-    }
-
     /// To restore purchases, you have to call this method.
     ///
     /// Read more on the [Xee Documentation](https://xee.invalid/docs)

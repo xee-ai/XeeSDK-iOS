@@ -21,11 +21,9 @@ public final class Xee {
     let httpFallbackSession: Backend.FallbackExecutor
     let httpConfigsSession: Backend.ConfigsExecutor
 
-    let receiptManager: StoreKitReceiptManager
     let transactionManager: StoreKitTransactionManager
     let productsManager: StoreKitProductsManager
     var purchaser: StorekitPurchaser?
-    var sk1QueueManager: SK1QueueManager?
 
     package let observerMode: Bool
 
@@ -51,69 +49,24 @@ public final class Xee {
             _ = await PurchasePayloadStorage.removeAllUnfinishedTransactionState()
         }
 
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            self.receiptManager = StoreKitReceiptManager(
-                httpSession: httpSession,
-                refreshIfEmpty: false
-            )
-            self.transactionManager = SK2TransactionManager(
-                httpSession: httpSession,
+        self.transactionManager = SK2TransactionManager(
+            httpSession: httpSession,
+            storage: purchasePayloadStorage
+        )
+        let sk2ProductsManager = SK2ProductsManager(
+            apiKeyPrefix: apiKeyPrefix,
+            session: httpSession,
+            storage: productVendorIdsStorage
+        )
+        self.productsManager = sk2ProductsManager
+
+        self.sharedProfileManager = restoreProfileManager(configuration)
+        if !observerMode {
+            self.purchaser = SK2Purchaser.startObserving(
+                transactionSynchronizer: self,
+                sk2ProductsManager: sk2ProductsManager,
                 storage: purchasePayloadStorage
             )
-            let sk2ProductsManager = SK2ProductsManager(
-                apiKeyPrefix: apiKeyPrefix,
-                session: httpSession,
-                storage: productVendorIdsStorage
-            )
-            self.productsManager = sk2ProductsManager
-
-            self.sharedProfileManager = restoreProfileManager(configuration)
-            if !observerMode {
-                self.purchaser = SK2Purchaser.startObserving(
-                    transactionSynchronizer: self,
-                    subscriptionOfferSigner: self,
-                    sk2ProductsManager: sk2ProductsManager,
-                    storage: purchasePayloadStorage
-                )
-
-                self.sk1QueueManager = SK1QueueManager.startObserving(
-                    transactionSynchronizer: self,
-                    subscriptionOfferSigner: self,
-                    productsManager: sk2ProductsManager,
-                    storage: purchasePayloadStorage
-                )
-            }
-
-        } else {
-            self.receiptManager = StoreKitReceiptManager(
-                httpSession: httpSession,
-                refreshIfEmpty: true
-            )
-            self.transactionManager = receiptManager
-            let sk1ProductsManager = SK1ProductsManager(
-                apiKeyPrefix: apiKeyPrefix,
-                session: httpSession,
-                storage: productVendorIdsStorage
-            )
-
-            self.productsManager = sk1ProductsManager
-
-            self.sharedProfileManager = restoreProfileManager(configuration)
-
-            if observerMode {
-                SK1TransactionObserver.startObserving(
-                    transactionSynchronizer: self,
-                    sk1ProductsManager: sk1ProductsManager
-                )
-            } else {
-                self.sk1QueueManager = SK1QueueManager.startObserving(
-                    transactionSynchronizer: self,
-                    subscriptionOfferSigner: self,
-                    productsManager: sk1ProductsManager,
-                    storage: purchasePayloadStorage
-                )
-                self.purchaser = sk1QueueManager
-            }
         }
         startSyncIPv4OnceIfNeeded()
     }
@@ -171,21 +124,13 @@ public final class Xee {
                 let meta = await Environment.Meta(includedAnalyticIds: !analyticsDisabled)
                 let httpSession = self.httpSession
 
-                let result = await Result.from { () throws -> (VH<XeeProfile>, CrossPaywallState) in
-                    let response = try await httpSession.createProfile(
+                let result = await Result.from { () throws -> VH<XeeProfile> in
+                    try await httpSession.createProfile(
                         userId: newUserId,
                         appAccountToken: appAccountToken,
                         parameters: XeeProfileParameters(analyticsDisabled: analyticsDisabled),
                         environmentMeta: meta
                     )
-
-                    var crossPaywallState = CrossPaywallState.defaultForNewUser
-                    if newUserId.isNotEqualProfileId(response) {
-                        crossPaywallState = try await httpSession.fetchCrossPaywallState(
-                            userId: response.userId
-                        )
-                    }
-                    return (response, crossPaywallState)
                 }
 
                 guard case let .creating(next, _) = self.sharedProfileManager,
@@ -196,7 +141,7 @@ public final class Xee {
                 }
 
                 switch result {
-                case let .success((createdProfile, crossPaywallState)):
+                case let .success(createdProfile):
                     if newUserId.isNotEqualProfileId(createdProfile) {
                         self.profileStorage.clearProfile(newProfile: createdProfile)
                     } else {
@@ -209,7 +154,6 @@ public final class Xee {
                         sentEnvironment: meta.sentEnvironment
                     )
                     self.sharedProfileManager = .current(manager)
-                    manager.saveCrossPaywallState(crossPaywallState)
                     return manager
 
                 case let .failure(error):
