@@ -26,10 +26,14 @@ public extension Xee {
     ///
     /// - Parameters:
     ///   - id: The view's ID, such as `onboarding`.
+    ///   - locale: The language to show the view's text in, such as "fr". Leave it out: the view comes in the
+    ///     language the app runs in when the app offers it in Xee, otherwise in the app's source language.
     ///   - loadTimeout: Seconds to wait for the server, at least 1. Views default to 2 because they
     ///     often run at first launch.
-    nonisolated static func getView(_ id: String, loadTimeout: TimeInterval = 2) async -> XeeView {
-        await view(id) { try await getPaywallVariant(paywallId: id, loadTimeout: loadTimeout) }
+    nonisolated static func getView(_ id: String, locale: String? = nil, loadTimeout: TimeInterval = 2) async -> XeeView {
+        await view(id, locale: locale) { locale in
+            try await getPaywallVariant(paywallId: id, locale: locale.id, loadTimeout: loadTimeout)
+        }
     }
 
     /// Tells Xee the view is on screen. Call it once, when its first screen appears: view tests count
@@ -51,10 +55,15 @@ public extension Xee {
 }
 
 extension Xee {
-    /// `getView` with the loading passed in, so the fallback is tested without the shared SDK.
-    nonisolated static func view(_ id: String, load: () async throws -> XeePaywallVariant) async -> XeeView {
+    /// `getView` with the loading passed in, so the fallback is tested without the shared SDK. `load` gets
+    /// the locale the view is requested in.
+    nonisolated static func view(
+        _ id: String,
+        locale: String?,
+        load: (XeeLocale) async throws -> XeePaywallVariant
+    ) async -> XeeView {
         do {
-            let variant = try await load()
+            let variant = try await load(requestLocale(locale))
             return XeeView(id: id, variationId: variant.variationId, config: variant.config)
         } catch {
             log.warn("Xee.getView(\"\(id)\") could not load (\(error)); the view uses the code's defaults")

@@ -17,21 +17,10 @@ protocol PaywallContent: Sendable, Codable {
 }
 
 extension PaywallContent {
-    var locale: XeeLocale? {
-        var remoteConfigLocale = remoteConfig?.xeeLocale
-        if remoteConfigLocale?.equalLanguageCode(.defaultPaywallLocale) ?? false {
-            remoteConfigLocale = nil
-        }
-        return remoteConfigLocale
-    }
-
-
-    
-    func has(languageCode otherLocale: XeeLocale, orDefault: Bool = false) -> Bool {
-        let locale = locale ?? .defaultPaywallLocale
-        if locale.equalLanguageCode(otherLocale) { return true }
-        else if orDefault, locale.equalLanguageCode(.defaultPaywallLocale) { return true }
-        else { return false }
+    /// Whether this copy was fetched for `other`: the server translated it for that request, so a copy
+    /// fetched in another language is not reused, even one the server answered in the same language.
+    func matches(requestLocale other: XeeLocale) -> Bool {
+        (requestLocale.normalized ?? requestLocale).id == (other.normalized ?? other).id
     }
 
     func has(variationId: String?) -> Bool {
@@ -53,8 +42,8 @@ extension VH where Value: PaywallContent {
         }
     }
 
-    func has(languageCode locale: XeeLocale, orDefault: Bool = false) -> Bool {
-        value.has(languageCode: locale, orDefault: orDefault)
+    func matches(requestLocale locale: XeeLocale) -> Bool {
+        value.matches(requestLocale: locale)
     }
 
     func has(variationId: String?) -> Bool {

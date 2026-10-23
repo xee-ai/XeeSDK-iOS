@@ -41,7 +41,6 @@ extension PaywallStorage {
         guard let paywall: Content = getPaywallById(
             paywallId,
             withLocale: locale,
-            orDefaultLocale: true,
             withVariationId: variationId
         )?.value
         else { return nil }

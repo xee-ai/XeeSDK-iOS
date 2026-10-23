@@ -13,10 +13,9 @@ extension Xee {
     ///
     /// - Parameters:
     ///   - paywallId: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Xee Dashboard.
-    ///   - locale: The identifier of the paywall [localization](https://xee.invalid/docs).
-    ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
-    ///             Example: "en" means English, "en-US" represents US English.
-    ///             If the parameter is omitted, the paywall will be returned in the default locale.
+    ///   - locale: The language to show the paywall's text in, such as "fr" or "pt-BR". Leave it out: the
+    ///             paywall comes in the language the app runs in (`Bundle.main.preferredLocalizations`) when the
+    ///             app offers that language in Xee (Settings › Languages), otherwise in the app's source language.
     ///   - fetchPolicy: by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
     /// - Returns: The ``XeePaywallVariant`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
     /// - Throws: An ``XeeError`` object
@@ -25,7 +24,7 @@ extension Xee {
         locale: String? = nil,
         fetchPolicy: XeePaywallFetchPolicy = .default
     ) async throws(XeeError) -> XeePaywallVariant {
-        let locale = locale.trimmed.nonEmptyOrNil.map { XeeLocale($0) } ?? .defaultPaywallLocale
+        let locale = Xee.requestLocale(locale)
         let paywallId = paywallId.trimmed
         // TODO: throw error if paywallId isEmpty
 
@@ -59,7 +58,6 @@ extension Xee {
             .getPaywallById(
                 paywallId,
                 withLocale: locale,
-                orDefaultLocale: true,
                 withVariationId: nil
             )?
             .withFetchPolicy(fetchPolicy)?
@@ -85,7 +83,6 @@ extension Xee {
                 manager.paywallStorage.getPaywallById(
                     paywallId,
                     withLocale: locale,
-                    orDefaultLocale: false,
                     withVariationId: nil
                 )?.value,
                 manager.isTestUser

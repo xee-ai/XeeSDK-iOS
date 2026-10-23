@@ -11,16 +11,23 @@ import Foundation
 private let log = Log.default
 
 extension Xee {
+    /// The locale a paywall or view is requested in: the one passed when it is a locale, otherwise the
+    /// language the app runs in. The server resolves it against the app's languages.
+    nonisolated static func requestLocale(_ passed: String?) -> XeeLocale {
+        passed.trimmed.nonEmptyOrNil.flatMap { XeeLocale($0).normalized } ?? .app
+    }
+}
+
+extension Xee {
     /// Xee allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
     ///
     /// Read more on the [Xee Documentation](https://xee.invalid/docs)
     ///
     /// - Parameters:
     ///   - paywallId: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Xee Dashboard.
-    ///   - locale: The identifier of the paywall [localization](https://xee.invalid/docs).
-    ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
-    ///             Example: "en" means English, "en-US" represents US English.
-    ///             If the parameter is omitted, the paywall will be returned in the default locale.
+    ///   - locale: The language to show the paywall's text in, such as "fr" or "pt-BR". Leave it out: the
+    ///             paywall comes in the language the app runs in (`Bundle.main.preferredLocalizations`) when the
+    ///             app offers that language in Xee (Settings › Languages), otherwise in the app's source language.
     ///   - fetchPolicy: by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
     /// - Returns: The ``XeePaywallVariant`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
     /// - Throws: An ``XeeError`` object
@@ -31,7 +38,7 @@ extension Xee {
         loadTimeout: TimeInterval? = nil
     ) async throws(XeeError) -> XeePaywallVariant {
         let loadTimeout = (loadTimeout ?? .defaultLoadPaywallTimeout).allowedLoadPaywallTimeout
-        let locale = locale.trimmed.nonEmptyOrNil.map { XeeLocale($0) } ?? .defaultPaywallLocale
+        let locale = Xee.requestLocale(locale)
         let paywallId = paywallId.trimmed
         // TODO: throw error if paywallId isEmpty
 
@@ -133,7 +140,6 @@ extension Xee {
             .getPaywallById(
                 paywallId,
                 withLocale: locale,
-                orDefaultLocale: true,
                 withVariationId: nil
             )?
             .withFetchPolicy(fetchPolicy)?
@@ -160,7 +166,6 @@ extension Xee {
                     .getPaywallById(
                         paywallId,
                         withLocale: locale,
-                        orDefaultLocale: false,
                         withVariationId: nil
                     )?
                     .value
@@ -247,7 +252,6 @@ extension Xee {
                     cached: manager.paywallStorage.getPaywallById(
                         paywallId,
                         withLocale: locale,
-                        orDefaultLocale: false,
                         withVariationId: nil
                     )?.value,
                     isTestUser: manager.isTestUser

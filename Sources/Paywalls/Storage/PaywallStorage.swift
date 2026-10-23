@@ -50,13 +50,12 @@ final class PaywallStorage {
     func getPaywallById<Content: PaywallContent>(
         _ paywallId: String,
         withLocale locale: XeeLocale,
-        orDefaultLocale: Bool,
         withVariationId variationId: String?
     ) -> VH<Content>? {
         guard
             var content: VH<Content> = Self.getPaywall(paywallId),
             content.has(variationId: variationId),
-            content.has(languageCode: locale, orDefault: orDefaultLocale)
+            content.matches(requestLocale: locale)
         else { return nil }
 
         content.requestLocale = locale
@@ -65,7 +64,7 @@ final class PaywallStorage {
 
     private func getNewerPaywall<Content: PaywallContent>(than content: Content) -> Content? {
         guard var cached: Content = Self.getPaywall(content.paywall.id)?.value,
-              cached.remoteConfig?.xeeLocale == content.remoteConfig?.xeeLocale,
+              cached.matches(requestLocale: content.requestLocale),
               cached.variationId == content.variationId,
               cached.paywall.isNewerThan(content.paywall)
         else { return nil }
