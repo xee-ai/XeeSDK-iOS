@@ -22,15 +22,27 @@ final class FirstSightings: @unchecked Sendable {
 /// of another type, returns that default, so a paywall never breaks because of the server.
 public struct XeePaywallConfig: @unchecked Sendable {
     private let values: [String: Any]
+    /// No "missing key" log lines: every key is missing on purpose.
+    private let quiet: Bool
     private static let fallbacks = FirstSightings()
 
     init(json: String) {
         let parsed = json.data(using: .utf8).flatMap { try? JSONSerialization.jsonObject(with: $0) }
         values = parsed as? [String: Any] ?? [:]
+        quiet = false
     }
 
+    private init(emptyValues: Void) {
+        values = [:]
+        quiet = true
+    }
+
+    /// Every getter returns the code's default, without a log line: what `Xee.getView` hands back when
+    /// the view could not load.
+    public static let empty = XeePaywallConfig(emptyValues: ())
+
     private func fallback<T>(_ key: String, expecting type: String, _ value: T) -> T {
-        if Self.fallbacks.isFirst(key) {
+        if !quiet, Self.fallbacks.isFirst(key) {
             Log.default.debug("paywall config key '\(key)' is missing or not a \(type); using the code's default")
         }
         return value

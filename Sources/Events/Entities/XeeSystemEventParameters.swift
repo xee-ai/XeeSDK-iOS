@@ -153,6 +153,8 @@ enum MethodName: String {
 
     case logShowPaywallVariant = "log_show_paywall"
 
+    case logShowView = "log_show_view"
+
     case presentCodeRedemptionSheet = "present_code_redemption_sheet"
 
     case updateCollectingRefundDataConsent = "update_collecting_refund_data_consent"
