@@ -1,8 +1,3 @@
-// Partly adapted from Mixpanel Swift 7.0.0 (Apache License 2.0, Copyright 2022 Mixpanel, Inc.; see LICENSE-Mixpanel):
-// the rule that a number must be neither NaN nor infinite comes from MixpanelType.swift. Changed: the
-// value type is a closed enum of four cases, and an invalid value is dropped with a log line instead of
-// failing an assertion.
-//
 //  XeeTrackParameters.swift
 //  XeeSDK
 //

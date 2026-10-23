@@ -1,8 +1,3 @@
-// Adapted from Mixpanel Swift 7.0.0 (Apache License 2.0, Copyright 2022 Mixpanel, Inc.; see LICENSE-Mixpanel):
-// the timed-event bookkeeping of Track.swift, `time(event:)` and the `$duration` taken in `track`. Changed:
-// the elapsed time is whole milliseconds, taking a timer removes it in one step, and the timers are not
-// saved, so a cold start forgets them.
-//
 //  XeeEventTimers.swift
 //  XeeSDK
 //
