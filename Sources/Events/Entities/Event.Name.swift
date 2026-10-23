@@ -19,6 +19,7 @@ extension Event {
 
         case profileRefundSaverSettings = "profile_refund_saver_settings"
         case activity = "xee_activity"
+        case track = "xee_track"
     }
 
     var name: String {
@@ -38,6 +39,8 @@ extension Event {
                 .profileRefundSaverSettings
             case .activity:
                 .activity
+            case .track:
+                .track
             }
 
         return name.rawValue

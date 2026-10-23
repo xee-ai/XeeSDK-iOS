@@ -15,6 +15,7 @@ enum Event: Sendable {
     case сonsentToCollectingRefundData(XeeConsentToCollectingDataParameters)
     case refundPreference(XeeRefundPreferenceParameters)
     case activity(XeeActivityParameters)
+    case track(XeeTrackParameters)
     case system(XeeSystemEventParameters)
 }
 
@@ -42,6 +43,8 @@ extension Event: Encodable {
         case let .refundPreference(value):
             try value.encode(to: encoder)
         case let .activity(value):
+            try value.encode(to: encoder)
+        case let .track(value):
             try value.encode(to: encoder)
         case let .system(value):
             let data = try Event.encoder.encode(value)
