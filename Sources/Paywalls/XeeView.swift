@@ -29,13 +29,7 @@ public extension Xee {
     ///   - loadTimeout: Seconds to wait for the server, at least 1. Views default to 2 because they
     ///     often run at first launch.
     nonisolated static func getView(_ id: String, loadTimeout: TimeInterval = 2) async -> XeeView {
-        do {
-            let variant = try await getPaywallVariant(paywallId: id, loadTimeout: loadTimeout)
-            return XeeView(id: id, variationId: variant.variationId, config: variant.config)
-        } catch {
-            log.warn("Xee.getView(\"\(id)\") could not load (\(error)); the view uses the code's defaults")
-            return XeeView(id: id, variationId: nil, config: .empty)
-        }
+        await view(id) { try await getPaywallVariant(paywallId: id, loadTimeout: loadTimeout) }
     }
 
     /// Tells Xee the view is on screen. Call it once, when its first screen appears: view tests count
@@ -52,6 +46,19 @@ public extension Xee {
             }
         } catch {
             log.error("Xee.logShowView(\"\(view.id)\") failed: \(error)")
+        }
+    }
+}
+
+extension Xee {
+    /// `getView` with the loading passed in, so the fallback is tested without the shared SDK.
+    nonisolated static func view(_ id: String, load: () async throws -> XeePaywallVariant) async -> XeeView {
+        do {
+            let variant = try await load()
+            return XeeView(id: id, variationId: variant.variationId, config: variant.config)
+        } catch {
+            log.warn("Xee.getView(\"\(id)\") could not load (\(error)); the view uses the code's defaults")
+            return XeeView(id: id, variationId: nil, config: .empty)
         }
     }
 }

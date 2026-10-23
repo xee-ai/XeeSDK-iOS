@@ -15,7 +15,8 @@ struct ViewTests {
     }
 
     @Test func aViewThatCannotLoadReadsTheCodesDefaults() async {
-        let view = await Xee.getView("view_never_pushed", loadTimeout: 1)
+        // Not the real getView: with the shared SDK activated by another suite it would reach the network.
+        let view = await Xee.view("view_never_pushed") { throw URLError(.notConnectedToInternet) }
         #expect(view.id == "view_never_pushed")
         #expect(view.variationId == nil)
         #expect(view.config.string("welcome_title", default: "Trade smarter") == "Trade smarter")
