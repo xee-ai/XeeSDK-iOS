@@ -17,12 +17,26 @@ struct SendEventsRequest: BackendEncodableRequest {
     let stamp = Log.stamp
     var requestName = BackendRequestName.sendEvents
 
-    let events: [Data]
+    /// The JSON body, gzipped when `gzip` was asked for and zlib managed it (then `headers` say so).
+    private let body: Data
 
-    init(userId: XeeUserId, events: [Data]) {
-        headers = HTTPHeaders().setUserProfileId(userId)
-        self.events = events
+    init(userId: XeeUserId, events: [Data], gzip: Bool) {
+        var plain = Data()
+        plain.append(Constants.prefix)
+        plain.append(contentsOf: events.joined(separator: Constants.separator))
+        plain.append(Constants.suffix)
+        var headers = HTTPHeaders().setUserProfileId(userId)
+        if gzip, let packed = plain.gzipped() {
+            headers["Content-Encoding"] = "gzip"
+            body = packed
+        } else {
+            body = plain
+        }
+        self.headers = headers
     }
+
+    /// Whether the body went out gzipped.
+    var isGzipped: Bool { headers["Content-Encoding"] == "gzip" }
 
     enum CodingKeys: String, CodingKey {
         case events
@@ -42,22 +56,25 @@ struct SendEventsRequest: BackendEncodableRequest {
     }
 
     func getData(configuration _: HTTPConfiguration) throws -> Data? {
-        var data = Data()
-        data.append(Constants.prefix)
-        data.append(contentsOf: events.joined(separator: Constants.separator))
-        data.append(Constants.suffix)
-        return data
+        body
     }
+
+    /// Not used: `getData` returns the body built in `init`.
+    func encode(to _: Encoder) throws {}
 }
 
 extension Backend.EventsExecutor {
+    /// Sends one batch; `gzip` compresses the body. Returns whether it went out gzipped.
+    @discardableResult
     func sendEvents(
         userId: XeeUserId,
-        events: [Data]
-    ) async throws(EventsError) {
+        events: [Data],
+        gzip: Bool
+    ) async throws(EventsError) -> Bool {
         let request = SendEventsRequest(
             userId: userId,
-            events: events
+            events: events,
+            gzip: gzip
         )
 
         let baseUrl: URL
@@ -73,5 +90,6 @@ extension Backend.EventsExecutor {
             manager.handleNetworkState(kind, request.requestName, baseUrl, error)
             throw EventsError.sending(error)
         }
+        return request.isGzipped
     }
 }

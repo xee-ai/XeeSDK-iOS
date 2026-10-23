@@ -22,6 +22,13 @@ final class XeeEventTimers: @unchecked Sendable {
         starts[name] = date
     }
 
+    /// Forgets every timer (opt-out).
+    func clearAll() {
+        lock.lock()
+        defer { lock.unlock() }
+        starts.removeAll()
+    }
+
     /// Milliseconds since `start` for this name, and forgets the timer; `nil` when none runs.
     func take(_ name: String, at date: Date) -> Int? {
         lock.lock()

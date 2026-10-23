@@ -22,9 +22,13 @@ extension Xee {
     private static var shared: Shared?
     static func set(activatingSDK task: Task<Xee, Never>) {
         if shared == nil { shared = .activating(task) }
+        XeeTrackQueue.shared.activated()
     }
 
-    static func set(shared sdk: Xee) { shared = .activated(sdk) }
+    static func set(shared sdk: Xee) {
+        shared = .activated(sdk)
+        XeeTrackQueue.shared.activated()
+    }
 
     @XeeActor
     package static var activatedSDK: Xee {

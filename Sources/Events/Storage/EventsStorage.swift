@@ -10,72 +10,52 @@ import Foundation
 
 private let log = Log.storage
 
+/// The per-kind event counters (sent as `counter`), in UserDefaults. The events themselves are in
+/// `EventsDatabase`; the queue that older SDK versions kept in UserDefaults is moved there once.
 @EventsManagerActor
-final class EventsStorage {
-    static var all = Kind.allCases.map { EventsStorage(kind: $0) }
+enum EventsStorage {
+    private static let userDefaults = Storage.userDefaults
 
-    private let kind: Kind
-
-    private init(kind: Kind) {
-        self.kind = kind
+    private static func counterKey(_ kind: EventsDatabase.Kind) -> String {
+        "XeeSDK_\(prefix(kind))Event_Counter"
     }
 
-    var eventsCount: Int { AllEventsStorage.eventsCount[kind] ?? 0 }
-    var events: [Data]? { AllEventsStorage.events[kind] ?? nil }
-
-    func incrementEventCount() { AllEventsStorage.incrementEventCount(kind) }
-    func setEvents(_ value: [Data]) { AllEventsStorage.setEvents(value, kind) }
-    func clear() { AllEventsStorage.clear(kind) }
-
-    static func clearAll() {
-        all.forEach { $0.clear() }
+    private static func legacyEventsKey(_ kind: EventsDatabase.Kind) -> String {
+        "XeeSDK_Cached_\(prefix(kind))Events"
     }
-}
 
-private enum Kind: Sendable, Hashable, CaseIterable {
-    case defaultEvents
-    case sysLogEvents
-
-    var prefix: String {
-        switch self {
-        case .defaultEvents: ""
-        case .sysLogEvents: "SysLog"
+    private static func prefix(_ kind: EventsDatabase.Kind) -> String {
+        switch kind {
+        case .default: ""
+        case .sysLog: "SysLog"
         }
     }
 
-    var eventsKey: String { "XeeSDK_Cached_\(prefix)Events" }
-    var counterKey: String { "XeeSDK_\(prefix)Event_Counter" }
-}
-
-@EventsManagerActor
-private final class AllEventsStorage {
-    private static let userDefaults = Storage.userDefaults
-
-    static var eventsCount: [Kind: Int] = Dictionary(Kind.allCases.map {
-        ($0, userDefaults.integer(forKey: $0.counterKey))
-    }) { first, _ in first }
-
-    static var events: [Kind: [Data]?] = Dictionary(Kind.allCases.map {
-        ($0, userDefaults.object(forKey: $0.eventsKey) as? [Data])
-    }) { first, _ in first }
-
-    static func incrementEventCount(_ kind: Kind) {
-        let nextValue = (eventsCount[kind] ?? 0) + 1
-        userDefaults.set(nextValue, forKey: kind.counterKey)
-        eventsCount[kind] = nextValue
-        log.debug("Save \(kind.prefix)Event Counter = \(nextValue) success.")
+    /// The next counter value for `kind`, saved.
+    static func nextCounter(_ kind: EventsDatabase.Kind) -> Int {
+        let value = userDefaults.integer(forKey: counterKey(kind))
+        userDefaults.set(value + 1, forKey: counterKey(kind))
+        return value
     }
 
-    static func setEvents(_ value: [Data], _ kind: Kind) {
-        userDefaults.set(value, forKey: kind.eventsKey)
-        events[kind] = value
-        log.debug("Save \(kind.prefix)Events success.")
+    /// Moves the queue an older SDK version kept in UserDefaults into `database`, in order, once.
+    static func moveLegacyEvents(into database: EventsDatabase) {
+        for kind in EventsDatabase.Kind.allCases {
+            guard let events = userDefaults.object(forKey: legacyEventsKey(kind)) as? [Data] else { continue }
+            for data in events {
+                guard let packed = try? Event.Packed(from: data) else { continue }
+                database.insert(kind: kind, name: packed.name, data: data)
+            }
+            userDefaults.removeObject(forKey: legacyEventsKey(kind))
+            log.debug("Moved \(events.count) \(prefix(kind))events from UserDefaults to the events database.")
+        }
     }
 
-    static func clear(_ kind: Kind) {
-        userDefaults.removeObject(forKey: kind.counterKey)
-        userDefaults.removeObject(forKey: kind.eventsKey)
-        events[kind] = nil
-        eventsCount[kind] = 0
+    static func clearAll() {
+        for kind in EventsDatabase.Kind.allCases {
+            userDefaults.removeObject(forKey: counterKey(kind))
+            userDefaults.removeObject(forKey: legacyEventsKey(kind))
+        }
+        EventsDatabase.shared.deleteAll()
     }
 }

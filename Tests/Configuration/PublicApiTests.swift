@@ -25,6 +25,13 @@ struct PublicApiTests {
         _ = (track, time)
     }
 
+    @Test func optOutIsPublic() {
+        let out: () -> Void = Xee.optOutTracking
+        let back: () -> Void = Xee.optInTracking
+        let state: Bool = Xee.hasOptedOutTracking
+        _ = (out, back, state)
+    }
+
     /// Only named, never called, for the same reason as above: a call would reach the shared SDK.
     @Test func viewsArePublic() {
         let get: (String, TimeInterval) async -> XeeView = Xee.getView(_:loadTimeout:)
