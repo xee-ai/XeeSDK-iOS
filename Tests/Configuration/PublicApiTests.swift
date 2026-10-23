@@ -15,6 +15,15 @@ struct PublicApiTests {
             .build()
         #expect(String(describing: configuration).isEmpty == false)
     }
+
+    /// Only named, never called: a call would queue a real event while `WireTests` has the SDK activated.
+    @Test func trackAndTimeArePublic() {
+        let track: (String, [String: XeeProperty]) -> Void = Xee.track(_:properties:)
+        let time: (String) -> Void = Xee.time(_:)
+        let properties: [String: XeeProperty] = ["screen": "goals", "step": 2, "skipped": false, "ratio": 0.5]
+        #expect(properties.count == 4)
+        _ = (track, time)
+    }
 }
 
 #endif

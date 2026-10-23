@@ -64,6 +64,24 @@ struct TrackTests {
         #expect(make("onboarding_finished", ["duration_ms": 5])?.properties["duration_ms"] == .int(5), "kept without a timer")
     }
 
+    @Test func aTimerGivesTheElapsedMillisecondsOnce() {
+        let timers = XeeEventTimers()
+        let t0 = Date(timeIntervalSince1970: 1000)
+        timers.start("onboarding_finished", at: t0)
+        #expect(timers.take("onboarding_finished", at: t0.addingTimeInterval(1.5)) == 1500)
+        #expect(timers.take("onboarding_finished", at: t0.addingTimeInterval(2)) == nil, "cleared after one use")
+        #expect(timers.take("never_started", at: t0) == nil)
+        timers.start("restarted", at: t0)
+        timers.start("restarted", at: t0.addingTimeInterval(1))
+        #expect(timers.take("restarted", at: t0.addingTimeInterval(1.25)) == 250, "a second start replaces the first")
+    }
+
+    @Test func timingAnEmptyNameDoesNothing() {
+        let timers = XeeEventTimers()
+        timers.start("", at: Date(timeIntervalSince1970: 1000))
+        #expect(timers.take("", at: Date(timeIntervalSince1970: 1001)) == nil)
+    }
+
     @Test func theEventEncodesAsTheServerReadsIt() throws {
         let p = try #require(make("onboarding_step_viewed", ["screen": "goals", "step": 2]))
         #expect(Event.track(p).name == "xee_track")
