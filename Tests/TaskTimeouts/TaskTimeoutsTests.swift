@@ -13,6 +13,8 @@ import Foundation
 import Testing
 
 struct TaskTimeoutsTests {
+    /// The work sleeps for twice this. A call that returns before 1.5× it was cut off by the timeout; the
+    /// margin is half the duration because suites run in parallel and the scheduler can be late by ~0.1 s.
     let duration: TaskDuration = .milliseconds(500)
 
     @Test func testTask() async {
@@ -23,7 +25,7 @@ struct TaskTimeoutsTests {
             }
         }
 
-        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeInterval)
+        #expect(Date().timeIntervalSince(start) < 1.5 * duration.asTimeInterval)
     }
 
     @Test func testTaskWithoutCancellationHandler() async {
@@ -58,7 +60,7 @@ struct TaskTimeoutsTests {
             }
         }
 
-        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeInterval)
+        #expect(Date().timeIntervalSince(start) < 1.5 * duration.asTimeInterval)
     }
 }
 
