@@ -11,7 +11,7 @@ import Foundation
 extension Xee {
     public nonisolated static let SDKVersion = "0.5.0"
     /// Must equal `FALLBACK_FORMAT_VERSION` in the dashboard (`dashboard/lib/fallback.ts`), which writes the file.
-    nonisolated static let fallbackFormatVersion = 9
+    nonisolated static let fallbackFormatVersion = 10
     /// Stored on the device; changing it resets install tracking.
     nonisolated static let userAcquisitionVersion = 1
 

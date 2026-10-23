@@ -43,6 +43,7 @@ extension XeePaywallVariant: Codable {
         case variationId = "variation_id"
         case name = "paywall_variant_name"
         case remoteConfig = "remote_config"
+        case remoteConfigs = "remote_configs"
         case products
         case requestLocale = "request_locale"
     }
@@ -62,7 +63,17 @@ extension XeePaywallVariant: Codable {
         instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
         name = try container.decode(String.self, forKey: .name)
         variationId = try container.decode(String.self, forKey: .variationId)
-        remoteConfig = try container.decodeIfPresent(XeeRemoteConfig.self, forKey: .remoteConfig)
+        let sourceConfig = try container.decodeIfPresent(XeeRemoteConfig.self, forKey: .remoteConfig)
+        // A fallback file (format 10) carries every language; pick the one the server would serve this
+        // request. The server sends only `remote_config`, already in the right language.
+        if let all = try container.decodeIfPresent([XeeRemoteConfig].self, forKey: .remoteConfigs),
+           let wanted = decoder.userInfo.requestLocaleOrNil,
+           let match = XeeLocale.resolve(wanted, offered: all.map(\.xeeLocale)),
+           let picked = all.first(where: { $0.xeeLocale == match }) {
+            remoteConfig = picked
+        } else {
+            remoteConfig = sourceConfig
+        }
 
         products = try {
             var arrayContainer = try container.nestedUnkeyedContainer(forKey: .products)
