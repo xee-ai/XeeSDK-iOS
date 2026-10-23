@@ -27,7 +27,7 @@ struct WelcomeScreen: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Text(config.string("welcome_title", default: "Trade smarter"))
+            Text(config.string("welcome_title", default: String(localized: "Trade smarter")))
                 .font(.largeTitle.bold())
             if config.bool("show_skip", default: true) {
                 Button("Skip") { Xee.track("onboarding_skipped") }
