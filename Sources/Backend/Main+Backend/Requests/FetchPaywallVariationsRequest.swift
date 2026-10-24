@@ -35,7 +35,6 @@ struct FetchPaywallVariantsRequest: BackendRequest {
         headers = HTTPHeaders()
             .setPaywallVariantLocale(locale)
             .setUserProfileId(userId)
-            .setPaywallVersion(XeePaywallVersions.version(for: paywallId))
             .setPaywallVariantBuilderVersion(Xee.uiBuilderVersion)
             .setPaywallVariantBuilderConfigurationFormatVersion(Xee.uiSchemaVersion)
             .setSegmentId(segmentId)

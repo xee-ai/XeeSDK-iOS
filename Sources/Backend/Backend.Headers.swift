@@ -12,7 +12,6 @@ extension Backend.Request {
     fileprivate static let authorizationHeaderKey = "Authorization"
     fileprivate static let hashHeaderKey = "xee-sdk-previous-response-hash"
     fileprivate static let paywallVariantLocaleHeaderKey = "xee-paywall-locale"
-    fileprivate static let paywallVersionHeaderKey = "xee-paywall-version"
     fileprivate static let paywallVariantBuilderLocaleHeaderKey = "xee-paywall-builder-locale"
     fileprivate static let paywallVariantBuilderVersionHeaderKey = "xee-paywall-builder-version"
     fileprivate static let paywallVariantBuilderConfigurationFormatVersionHeaderKey = "xee-paywall-builder-config-format-version"
@@ -24,6 +23,7 @@ extension Backend.Request {
     fileprivate static let sdkStoreHeaderKey = "xee-sdk-store"
     fileprivate static let sessionIDHeaderKey = "xee-sdk-session"
     fileprivate static let appVersionHeaderKey = "xee-app-version"
+    fileprivate static let appBuildHeaderKey = "xee-app-build"
 
     fileprivate static let isSandboxHeaderKey = "xee-sdk-sandbox-mode-enabled"
     fileprivate static let isObserveModeHeaderKey = "xee-sdk-observer-mode-enabled"
@@ -53,6 +53,10 @@ extension Backend.Request {
             headers[appVersionHeaderKey] = ver
         }
 
+        // The build picks which version of each paywall and view the server sends: the newest one
+        // pushed for this build or an older one, so this build's code can read every key it gets.
+        headers = headers.setAppBuild(environment.application.build)
+
         if let crossPlatformSDK = configuration.crossPlatformSDK {
             headers[crossSDKPlatformHeaderKey] = crossPlatformSDK.name
             headers[crossSDKVersionHeaderKey] = crossPlatformSDK.version
@@ -73,8 +77,10 @@ extension HTTPHeaders {
         updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallVariantLocaleHeaderKey)
     }
 
-    func setPaywallVersion(_ version: Int?) -> Self {
-        updateOrRemoveValue(version.map(String.init), forKey: Backend.Request.paywallVersionHeaderKey)
+    /// The app's CFBundleVersion, trimmed; no header when it is missing or empty.
+    func setAppBuild(_ build: String?) -> Self {
+        let trimmed = build?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return updateOrRemoveValue(trimmed?.isEmpty == false ? trimmed : nil, forKey: Backend.Request.appBuildHeaderKey)
     }
 
     func setPaywallVariantBuilderLocale(_ locale: XeeLocale?) -> Self {
