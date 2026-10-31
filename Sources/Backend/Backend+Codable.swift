@@ -43,6 +43,7 @@ private extension CodingUserInfoKey {
     static let paywallId = CodingUserInfoKey(rawValue: "adapty_paywall_id")!
     static let paywallVariationId = CodingUserInfoKey(rawValue: "adapty_paywall_variation_id")!
     static let paywall = CodingUserInfoKey(rawValue: "adapty_paywall")!
+    static let assignedVariation = CodingUserInfoKey(rawValue: "xee_assigned_variation")!
     static let requestlocale = CodingUserInfoKey(rawValue: "adapty_request_locale")!
 }
 
@@ -65,6 +66,10 @@ extension CodingUserInfo {
 
     mutating func setPaywallVariationId(_ value: String) {
         self[.paywallVariationId] = value
+    }
+
+    mutating func setAssignedVariation(_ value: PaywallAssignment) {
+        self[.assignedVariation] = value
     }
 
     package mutating func enableEncodingViewConfiguration() {
@@ -119,6 +124,10 @@ extension [CodingUserInfoKey: Any] {
 
     var paywallVariationIdOrNil: String? {
         self[.paywallVariationId] as? String
+    }
+
+    var assignedVariationOrNil: PaywallAssignment? {
+        self[.assignedVariation] as? PaywallAssignment
     }
 }
 

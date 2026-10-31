@@ -88,7 +88,18 @@ public final class Xee {
         )
 
         guard let currentProfile = profileStorage.profile else {
-            // no existing user found
+            // no existing user found: with a customer user ID, under the ID computed from it
+            if let newCustomerUserId {
+                let computed = XeeUserId(
+                    profileId: XeeUserId.computedProfileId(for: newCustomerUserId),
+                    customerId: newCustomerUserId
+                )
+                profileStorage.startComputedProfile(computed)
+                return .creating(
+                    next: .init(userId: computed),
+                    task: createNewProfileOnServer(computed, newAppAccountToken)
+                )
+            }
             return .creating(
                 next: .init(userId: newUserId),
                 task: createNewProfileOnServer(newUserId, newAppAccountToken)
@@ -329,6 +340,13 @@ extension Xee {
         guard let manager = profileManager else { return nil }
         guard manager.isEqualProfileId(userId) else { throw .profileWasChanged() }
         return manager
+    }
+
+    /// The user whose profile the server is still making, when its ID is computed from the customer user ID and so
+    /// cannot change: a paywall can be asked for under it without waiting.
+    var creatingComputedUserId: XeeUserId? {
+        guard case let .creating(next, _) = sharedProfileManager, next.userId.isComputed else { return nil }
+        return next.userId
     }
 
     var createdProfileManager: ProfileManager {

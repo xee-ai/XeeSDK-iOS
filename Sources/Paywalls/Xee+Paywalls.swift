@@ -94,6 +94,17 @@ extension Xee {
         _ fetchPolicy: XeePaywallFetchPolicy,
         _ loadTimeout: TaskDuration
     ) async throws(XeeError) -> Content {
+        // A first launch under a computed ID: the profile is still being made, but its ID is known and fixed, so the
+        // paywall is asked for now (the route that needs no profile) instead of after the server answers.
+        if let computed = creatingComputedUserId {
+            return try await fetchFallbackPaywall(
+                paywallId,
+                locale,
+                forUserId: computed,
+                withTimeout: loadTimeout.asTimeInterval
+            )
+        }
+
         var userId = profileStorage.userId
         let startTaskTime = Date()
 
@@ -172,6 +183,8 @@ extension Xee {
                 return (manager.segmentId, cached, manager.isTestUser)
             }()
 
+            let assigned = await assignedVariation(paywallId, userId)
+
             do throws(HTTPError) {
                 var chosen: XeePaywallChosen<Content> = try await httpSession.fetchPaywallVariations(
                     apiKeyPrefix: apiKeyPrefix,
@@ -180,8 +193,14 @@ extension Xee {
                     locale: locale,
                     segmentId: segmentId,
                     cached: cached,
+                    assigned: assigned,
                     disableServerCache: isTestUser
                 )
+
+                // A kept arm of an earlier test: forget it, the next fetch asks for the new test's.
+                if let assigned, case let .draw(draw) = chosen, assigned.audienceVersionId != draw.paywallAudienceVersionId {
+                    PaywallAssignmentStorage.clear(profileId: userId.profileId, paywallId: paywallId)
+                }
 
                 if let manager = try? profileManager(withProfileId: userId) {
                     chosen = manager.paywallStorage.savedPaywallChosen(chosen)
@@ -208,6 +227,22 @@ extension Xee {
             guard manager.segmentId == oldSegmentId else { return true }
             return await manager.fetchSegmentId() != oldSegmentId
         }
+    }
+
+    /// The server's arm for this paywall's running test: kept from an earlier answer, else asked for (2 s at most). Nil
+    /// on any failure or with no running test: the device then draws as before.
+    private func assignedVariation(_ paywallId: String, _ userId: XeeUserId) async -> PaywallAssignment? {
+        if let kept = PaywallAssignmentStorage.assignment(profileId: userId.profileId, paywallId: paywallId) {
+            return kept
+        }
+        let session = httpSession
+        let prefix = apiKeyPrefix
+        // `try?` flattens the optional: nil on an error, a timeout or no running test.
+        guard let answer = try? await withThrowingTimeout(.seconds(2), operation: {
+            try await session.fetchPaywallAssignment(apiKeyPrefix: prefix, userId: userId, paywallId: paywallId)
+        }) else { return nil }
+        PaywallAssignmentStorage.set(answer, profileId: userId.profileId, paywallId: paywallId)
+        return answer
     }
 
     func getCacheOrFallbackFilePaywall<Content: PaywallContent>(

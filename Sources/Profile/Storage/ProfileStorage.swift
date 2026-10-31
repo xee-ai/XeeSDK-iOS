@@ -163,6 +163,15 @@ extension ProfileStorage {
         Self.clearProfile(newProfile: newProfile)
     }
 
+    /// A first launch with a customer user ID: the profile starts under its computed ID (`XeeUserId.computedProfileId`)
+    /// instead of the random one, so nothing has to wait for the server to name it.
+    func startComputedProfile(_ newUserId: XeeUserId) {
+        guard Self.profile == nil, Self.userId.isNotEqualProfileId(newUserId) else { return }
+        Self.userDefaults.set(newUserId.profileId, forKey: Constants.profileIdKey)
+        Self.userId = newUserId
+        log.debug("start computed profile (profileId: \(newUserId.profileId))")
+    }
+
     func setIdentifiedProfile(_ newProfile: VH<XeeProfile>) {
         Self.setProfile(newProfile)
         Self.setSyncedTransactionsHistory(false)

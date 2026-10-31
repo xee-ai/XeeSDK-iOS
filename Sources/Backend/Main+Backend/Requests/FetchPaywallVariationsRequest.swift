@@ -62,6 +62,7 @@ extension Backend.MainExecutor {
         locale: XeeLocale,
         segmentId: String,
         cached: Content?,
+        assigned: PaywallAssignment? = nil,
         disableServerCache: Bool
     ) async throws(HTTPError) -> XeePaywallChosen<Content> {
         let request = FetchPaywallVariantsRequest(
@@ -77,7 +78,8 @@ extension Backend.MainExecutor {
             withUserId: userId,
             withPaywallId: paywallId,
             withRequestLocale: locale,
-            withCached: cached
+            withCached: cached,
+            withAssigned: assigned
         ))
 
         return response.body

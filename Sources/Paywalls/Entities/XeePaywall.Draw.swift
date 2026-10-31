@@ -34,6 +34,11 @@ extension XeePaywall.Draw: Decodable {
                 throw PaywallDecodingError.notFoundVariationId
             }
             index = founded
+        } else if let assigned = decoder.userInfo.assignedVariationOrNil,
+                  assigned.audienceVersionId == paywallAudienceVersionId,
+                  let kept = variations.firstIndex(where: { $0.variationId == assigned.variationId }) {
+            // The server's choice for this test (Xee+Paywalls.swift, assignedVariation); a stale one is ignored.
+            index = kept
         } else {
             index = variations.draw(
                 paywallAudienceVersionId: paywallAudienceVersionId,

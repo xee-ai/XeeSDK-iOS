@@ -14,7 +14,8 @@ extension XeePaywallChosen {
         withUserId userId: XeeUserId,
         withPaywallId paywallId: String,
         withRequestLocale requestLocale: XeeLocale,
-        withCached cached: Content?
+        withCached cached: Content?,
+        withAssigned assigned: PaywallAssignment? = nil
     ) -> HTTPDecoder<XeePaywallChosen> {
         return decoder
 
@@ -40,6 +41,7 @@ extension XeePaywallChosen {
             jsonDecoder.userInfo.setPaywall(paywall)
             jsonDecoder.userInfo.setUserId(userId)
             jsonDecoder.userInfo.setRequestLocale(requestLocale)
+            if let assigned { jsonDecoder.userInfo.setAssignedVariation(assigned) }
 
             let draw = try jsonDecoder.decode(
                 Backend.Response.Data<XeePaywall.Draw<Content>>.self,

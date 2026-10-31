@@ -68,5 +68,43 @@ import Testing
         let paywallVariant = try d.decode(Backend.Response.Data<XeePaywallVariant>.self, from: body).value
         #expect(paywallVariant.name == "PaywallVariant Try 3 days free")
     }
+
+    private func paywallAndBody() throws -> (XeePaywall, Data) {
+        let body = Data("""
+        {"data":[\(variant(a, 50, "Start free trial")),\(variant(b, 50, "Try 3 days free"))],"meta":\(meta)}
+        """.utf8)
+        let plain = JSONDecoder()
+        Backend.configure(jsonDecoder: plain)
+        return (try plain.decode(Backend.Response.Meta<XeePaywall>.self, from: body).value, body)
+    }
+
+    @Test func anAssignedVariationIsTheOneDecoded() throws {
+        let (paywall, body) = try paywallAndBody()
+        let user = XeeUserId(profileId: "33333333-cccc-4ccc-8ccc-333333333333", customerId: nil)
+        for pinned in [a, b] {
+            let d = decoder(userId: user, paywall: paywall)
+            d.userInfo.setAssignedVariation(PaywallAssignment(variationId: pinned, audienceVersionId: "t-1"))
+            let draw = try d.decode(Backend.Response.Data<XeePaywall.Draw<XeePaywallVariant>>.self, from: body).value
+            #expect(draw.content.variationId == pinned)
+        }
+    }
+
+    @Test func anAssignmentForAnotherTestOrAMissingVariationFallsBackToTheDraw() throws {
+        let (paywall, body) = try paywallAndBody()
+        let user = XeeUserId(profileId: "33333333-cccc-4ccc-8ccc-333333333333", customerId: nil)
+        for stale in [PaywallAssignment(variationId: b, audienceVersionId: "t-old"), PaywallAssignment(variationId: "gone", audienceVersionId: "t-1")] {
+            let d = decoder(userId: user, paywall: paywall)
+            d.userInfo.setAssignedVariation(stale)
+            let draw = try d.decode(Backend.Response.Data<XeePaywall.Draw<XeePaywallVariant>>.self, from: body).value
+            #expect([a, b].contains(draw.content.variationId))
+        }
+    }
+
+    @Test func theAssignmentAnswerDecodes() throws {
+        let some = try JSONDecoder().decode(PaywallAssignmentAnswer.self, from: Data(#"{"data":{"variation_id":"main.v2.B","paywall_audience_version_id":"t-1"}}"#.utf8))
+        #expect(some.data == PaywallAssignment(variationId: "main.v2.B", audienceVersionId: "t-1"))
+        let none = try JSONDecoder().decode(PaywallAssignmentAnswer.self, from: Data(#"{"data":null}"#.utf8))
+        #expect(none.data == nil)
+    }
 }
 #endif

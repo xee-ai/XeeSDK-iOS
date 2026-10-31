@@ -24,6 +24,7 @@ enum BackendRequestName: String {
     case fetchProfile = "get_profile"
     case updateProfile = "update_profile"
     case fetchPaywallVariants = "get_paywall_variants"
+    case fetchPaywallAssignment = "get_paywall_assignment"
     case fetchFallbackPaywallVariants = "get_fallback_paywall_variants"
     case fetchPaywallVariantsForDefaultAudience = "get_paywall_variants_for_default_audience"
 
