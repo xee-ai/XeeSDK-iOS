@@ -1,7 +1,7 @@
 //  XeeSK2Product.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 16.09.2024
+//  Created by Xee team.
 //
 
 import StoreKit

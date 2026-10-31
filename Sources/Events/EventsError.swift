@@ -1,7 +1,7 @@
 //  EventsError.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 07.10.2022.
+//  Created by Xee team.
 //
 
 enum EventsError: Error {

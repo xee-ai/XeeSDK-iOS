@@ -1,7 +1,7 @@
 //  SK2Product.SubscriptionOffer.PaymentMode.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 23.09.2024
+//  Created by Xee team.
 //
 
 import StoreKit

@@ -1,7 +1,7 @@
 //  XeeActor.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 20.09.2024
+//  Created by Xee team.
 //
 
 import Foundation

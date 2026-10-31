@@ -1,7 +1,7 @@
 //  URLSession+async.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 28.08.2024
+//  Created by Xee team.
 //
 
 import Foundation

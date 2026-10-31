@@ -1,7 +1,7 @@
 //  XeePaywallFetchPolicy.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 12.10.2023
+//  Created by Xee team.
 //
 
 import Foundation

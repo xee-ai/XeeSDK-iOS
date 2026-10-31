@@ -1,7 +1,7 @@
 //  Xee+PaywallForDefaultAudience.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 12.08.2024
+//  Created by Xee team.
 //
 
 import Foundation

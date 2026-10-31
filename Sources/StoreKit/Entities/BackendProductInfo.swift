@@ -1,7 +1,7 @@
 //  BackendProductInfo.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 11.08.2025.
+//  Created by Xee team.
 //
 
 import Foundation

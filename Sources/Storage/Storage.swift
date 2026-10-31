@@ -1,7 +1,7 @@
 //  Storage.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 15.10.2024
+//  Created by Xee team.
 //
 
 import Foundation

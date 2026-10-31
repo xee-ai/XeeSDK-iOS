@@ -1,7 +1,7 @@
 //  Backend.EventsExecutor.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 02.10.2024
+//  Created by Xee team.
 //
 
 import Foundation

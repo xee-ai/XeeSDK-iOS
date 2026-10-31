@@ -1,7 +1,7 @@
 //  XeeUserIdentifiable.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 01.08.2025.
+//  Created by Xee team.
 //
 
 protocol XeeUserIdentifiable {

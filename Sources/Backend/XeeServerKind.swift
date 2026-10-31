@@ -1,7 +1,7 @@
 //  XeeServerKind.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 12.11.2025.
+//  Created by Xee team.
 //
 
 import Foundation

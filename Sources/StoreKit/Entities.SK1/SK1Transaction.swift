@@ -1,7 +1,7 @@
 //  SK1Transaction.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 20.10.2023
+//  Created by Xee team.
 //
 
 import StoreKit

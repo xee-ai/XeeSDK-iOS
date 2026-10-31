@@ -1,7 +1,7 @@
 //  TypedThrows+Extensions.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 11.07.2025.
+//  Created by Xee team.
 //
 
 struct CheckedContinuationWrapper<T, E>: Sendable where E: Error {

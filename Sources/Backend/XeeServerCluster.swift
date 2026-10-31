@@ -1,7 +1,7 @@
 //  XeeServerCluster.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 05.11.2024.
+//  Created by Xee team.
 //
 
 public enum XeeServerCluster: Sendable {

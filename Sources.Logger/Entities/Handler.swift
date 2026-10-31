@@ -1,7 +1,7 @@
 //  Handler.swift
 //  XeeLogger
 //
-//  Created by Aleksei Valiano on 23.10.2022.
+//  Created by Xee team.
 //
 
 import Foundation

@@ -1,7 +1,7 @@
 //  UserAcquisitionManager.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 16.06.2025.
+//  Created by Xee team.
 //
 
 import Foundation

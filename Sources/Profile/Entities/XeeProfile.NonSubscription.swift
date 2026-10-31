@@ -1,7 +1,7 @@
 //  XeeProfile.NonSubscription.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 24.09.2022.
+//  Created by Xee team.
 //
 
 import Foundation

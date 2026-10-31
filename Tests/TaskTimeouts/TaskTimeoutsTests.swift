@@ -1,7 +1,7 @@
 //  TaskTimeoutsTests.swift
 //  XeeTests
 //
-//  Created by Alexey Goncharov on 1/28/25.
+//  Created by Xee team.
 //
 
 #if canImport(Testing)

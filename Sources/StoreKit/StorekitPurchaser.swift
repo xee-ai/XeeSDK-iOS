@@ -1,7 +1,7 @@
 //  StorekitPurchaser.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 06.08.2025.
+//  Created by Xee team.
 //
 
 import StoreKit

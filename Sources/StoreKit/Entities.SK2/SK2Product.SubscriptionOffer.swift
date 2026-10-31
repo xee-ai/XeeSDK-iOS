@@ -1,7 +1,7 @@
 //  SK2Product.SubscriptionOffer.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 01.02.2024
+//  Created by Xee team.
 //
 
 import StoreKit

@@ -1,7 +1,7 @@
 //  CustomerIdentityParameters.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 02.09.2025.
+//  Created by Xee team.
 //
 import Foundation
 

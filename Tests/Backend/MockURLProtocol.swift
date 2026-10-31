@@ -1,7 +1,7 @@
 //  MockURLProtocol.swift
 //  XeeTests
 //
-//  Created by Aleksei Valiano on 14.10.2025.
+//  Created by Xee team.
 //
 
 @testable import Xee

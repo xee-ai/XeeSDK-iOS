@@ -1,7 +1,7 @@
 //  XeePaywall.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 03.04.2025.
+//  Created by Xee team.
 //
 
 public struct XeePaywall: Sendable, Identifiable {

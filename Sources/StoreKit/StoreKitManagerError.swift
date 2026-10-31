@@ -1,7 +1,7 @@
 //  StoreKitManagerError.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 25.10.2022
+//  Created by Xee team.
 //
 
 import StoreKit

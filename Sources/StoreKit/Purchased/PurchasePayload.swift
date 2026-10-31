@@ -1,7 +1,7 @@
 //  PurchasePayload.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 08.09.2022.
+//  Created by Xee team.
 //
 
 import Foundation

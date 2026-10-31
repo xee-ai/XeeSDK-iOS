@@ -1,7 +1,7 @@
 //  BackendRequest.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 11.11.2025.
+//  Created by Xee team.
 //
 
 protocol BackendRequest: Sendable, HTTPRequest {

@@ -1,7 +1,7 @@
 //  String+Emptable.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 28.07.2025.
+//  Created by Xee team.
 //
 
 extension StringProtocol {

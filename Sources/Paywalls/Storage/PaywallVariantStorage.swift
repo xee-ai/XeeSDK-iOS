@@ -1,7 +1,7 @@
 //  PaywallVariantStorage.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 21.04.2025.
+//  Created by Xee team.
 //
 
 import Foundation

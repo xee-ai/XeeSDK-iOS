@@ -1,7 +1,7 @@
 //  Task+Cancellation.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 18.11.2024.
+//  Created by Xee team.
 //
 
 import Foundation

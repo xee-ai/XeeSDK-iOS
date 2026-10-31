@@ -1,7 +1,7 @@
 //  Source+Codable.swift
 //  XeeLogger
 //
-//  Created by Aleksei Valiano on 24.08.2024
+//  Created by Xee team.
 //
 
 import Foundation

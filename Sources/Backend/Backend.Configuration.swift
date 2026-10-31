@@ -1,7 +1,7 @@
 //  Backend.Configuration.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 30.10.2023
+//  Created by Xee team.
 //
 
 import Foundation

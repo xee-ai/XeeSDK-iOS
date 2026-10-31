@@ -1,7 +1,7 @@
 //  XeeInstallationDetails.Payload.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 13.06.2025.
+//  Created by Xee team.
 //
 import Foundation
 

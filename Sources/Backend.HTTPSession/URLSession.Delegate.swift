@@ -1,7 +1,7 @@
 //  URLSession.Delegate.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 29.08.2024
+//  Created by Xee team.
 //
 
 import Foundation

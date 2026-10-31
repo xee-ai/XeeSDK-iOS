@@ -1,7 +1,7 @@
 //  XeeError+Description.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 30.10.2022.
+//  Created by Xee team.
 //
 
 import Foundation

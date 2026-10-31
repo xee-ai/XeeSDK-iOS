@@ -1,7 +1,7 @@
 //  FallbackTests.swift
 //  XeeTests
 //
-//  Created by Aleksei Valiano on 21.05.2025.
+//  Created by Xee team.
 //
 
 #if canImport(Testing)

@@ -1,7 +1,7 @@
 //  PurchasedTransactionStorage.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 25.07.2025.
+//  Created by Xee team.
 //
 
 import Foundation

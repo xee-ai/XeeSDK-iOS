@@ -1,7 +1,7 @@
 //  Xee+Identify.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 22.09.2024
+//  Created by Xee team.
 //
 
 import Foundation

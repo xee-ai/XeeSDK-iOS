@@ -1,7 +1,7 @@
 //  BackendUnavailableError.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 13.11.2025.
+//  Created by Xee team.
 //
 
 import Foundation

@@ -1,7 +1,7 @@
 //  HTTPRequest.QueryItems.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 11.09.2022.
+//  Created by Xee team.
 //
 
 import Foundation

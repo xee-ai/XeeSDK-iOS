@@ -1,7 +1,7 @@
 //  SK2TransactionManager.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 06.02.2024
+//  Created by Xee team.
 //
 
 import StoreKit

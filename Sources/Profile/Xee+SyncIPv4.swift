@@ -1,7 +1,7 @@
 //  Xee+SyncIPv4.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 19.12.2023
+//  Created by Xee team.
 //
 
 import Foundation

@@ -1,7 +1,7 @@
 //  HTTPDataResponse.Validator.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 23.09.2022.
+//  Created by Xee team.
 //
 
 import Foundation

@@ -1,7 +1,7 @@
 //  XeePaywallVariant.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 08.04.2025.
+//  Created by Xee team.
 //
 
 import Foundation

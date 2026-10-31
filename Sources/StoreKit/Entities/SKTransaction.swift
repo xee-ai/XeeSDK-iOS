@@ -1,7 +1,7 @@
 //  SKTransaction.swift
 //  Xee
 //
-//  Created by Aleksei Valiano on 06.08.2025.
+//  Created by Xee team.
 //
 
 protocol SKTransaction: Sendable {

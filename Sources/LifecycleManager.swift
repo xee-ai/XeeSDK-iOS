@@ -1,7 +1,7 @@
 //  LifecycleManager.swift
 //  XeeSDK
 //
-//  Created by Aleksey Goncharov on 27.10.2022.
+//  Created by Xee team.
 //
 
 import Foundation

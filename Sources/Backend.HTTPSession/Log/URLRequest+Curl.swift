@@ -1,7 +1,7 @@
 //  URLRequest+Curl.swift
 //  SwiftyCURL
 //
-//  Created by Zakk Hoyt on 4/22/18.
+//  Created by Xee team.
 //  Copyright © 2018 Zakk Hoyt. All rights reserved.
 //
 

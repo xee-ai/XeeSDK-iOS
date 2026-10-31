@@ -1,7 +1,7 @@
 //  BackendProductInfo.Period.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 24.07.2025.
+//  Created by Xee team.
 //
 
 import Foundation

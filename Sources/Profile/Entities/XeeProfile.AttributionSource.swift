@@ -1,7 +1,7 @@
 //  XeeProfile.AttributionSource.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 26.05.2026.
+//  Created by Xee team.
 //
 
 extension XeeProfile {

@@ -1,7 +1,7 @@
 //  TimeoutError.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 12.09.2024
+//  Created by Xee team.
 //
 //
 

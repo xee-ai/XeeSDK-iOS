@@ -1,7 +1,7 @@
 //  Emptiable.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 27.07.2025.
+//  Created by Xee team.
 //
 
 protocol Emptiable {

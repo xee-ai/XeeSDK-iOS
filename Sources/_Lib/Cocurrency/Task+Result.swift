@@ -1,7 +1,7 @@
 //  Task+Result.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 08.10.2025.
+//  Created by Xee team.
 //
 
 package extension Task where Failure == Never {

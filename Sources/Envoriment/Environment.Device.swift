@@ -1,7 +1,7 @@
 //  Environment.Device.swift
 //  XeeSDK
 //
-//  Created by Andrey Kyashkin on 19.12.2019.
+//  Created by Xee team.
 //
 
 import Foundation

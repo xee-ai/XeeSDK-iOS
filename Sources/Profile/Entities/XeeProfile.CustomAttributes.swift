@@ -1,7 +1,7 @@
 //  XeeProfile.CustomAttributes.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 26.09.2022.
+//  Created by Xee team.
 //
 
 import Foundation

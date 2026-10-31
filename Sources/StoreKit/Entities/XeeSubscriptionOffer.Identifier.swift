@@ -1,7 +1,7 @@
 //  XeeSubscriptionOffer.Identifier.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 29.01.2024.
+//  Created by Xee team.
 //
 
 import Foundation

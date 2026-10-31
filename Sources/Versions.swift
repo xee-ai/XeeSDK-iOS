@@ -1,13 +1,13 @@
 //  Versions.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 11.08.2022.
+//  Created by Xee team.
 //
 
 import Foundation
 
 extension Xee {
-    public nonisolated static let SDKVersion = "0.6.4"
+    public nonisolated static let SDKVersion = "0.6.5"
     /// Must equal `FALLBACK_FORMAT_VERSION` in the dashboard (`dashboard/lib/fallback.ts`), which writes the file.
     nonisolated static let fallbackFormatVersion = 10
     /// Stored on the device; changing it resets install tracking.

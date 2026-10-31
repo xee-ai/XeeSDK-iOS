@@ -1,7 +1,7 @@
 //  ProfileManager.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 24.10.2022.
+//  Created by Xee team.
 //
 
 import Foundation

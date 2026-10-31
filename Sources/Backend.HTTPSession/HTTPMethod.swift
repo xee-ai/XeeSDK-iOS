@@ -1,7 +1,7 @@
 //  HTTPMethod.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 21.09.2022.
+//  Created by Xee team.
 //
 
 import Foundation

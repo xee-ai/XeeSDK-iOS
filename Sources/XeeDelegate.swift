@@ -1,7 +1,7 @@
 //  XeeDelegate.swift
 //  XeeSDK
 //
-//  Created by Andrey Kyashkin on 28.10.2019.
+//  Created by Xee team.
 //
 
 import Foundation

@@ -1,7 +1,7 @@
 //  Result+async.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 04.10.2025.
+//  Created by Xee team.
 //
 
 package extension Result {

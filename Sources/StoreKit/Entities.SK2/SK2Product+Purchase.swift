@@ -1,7 +1,7 @@
 //  SK2Product+Purchase.swift
 //  XeeSDK
 //
-//  Created by Alexey Goncharov on 15.01.2025.
+//  Created by Xee team.
 //
 
 import StoreKit

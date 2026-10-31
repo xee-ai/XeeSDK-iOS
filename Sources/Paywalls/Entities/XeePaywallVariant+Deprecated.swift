@@ -1,7 +1,7 @@
 //  XeePaywallVariant+Deprecated.swift
 //  XeeSDK
 //
-//  Created by Aleksei Valiano on 01.07.2025.
+//  Created by Xee team.
 //
 
 public extension XeePaywallVariant {
