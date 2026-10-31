@@ -1,4 +1,3 @@
-// Derived from Adapty iOS SDK 3.17.3 (MIT License, Copyright (c) 2020 Adapty Tech Inc.)
 #if canImport(Testing)
 
 @testable import Xee

@@ -139642,7 +139642,7 @@
                     "custom_payload": null,
                     "remote_config": {
                         "lang": "en",
-                        "data": "{\"string1\":\"Welcome to <b>Adapty</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\",\"string2\":\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\",\"string3\":\"Your paywall #12345 has been showed on 2023-11-27.\",\"string4\":\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\",\"string5\":\"Check out our site: https://example.com for more details.\",\"string6\":\"Newlines and tabs:\\nThis is a new line.\\tThis is a tab.\",\"string7\":\"Use escape sequences like \\\\n, \\\\t, and \\\\\\\\ for special formatting.\"}"
+                        "data": "{\"string1\":\"Welcome to <b>Xee</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\",\"string2\":\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\",\"string3\":\"Your paywall #12345 has been showed on 2023-11-27.\",\"string4\":\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\",\"string5\":\"Check out our site: https://example.com for more details.\",\"string6\":\"Newlines and tabs:\\nThis is a new line.\\tThis is a tab.\",\"string7\":\"Use escape sequences like \\\\n, \\\\t, and \\\\\\\\ for special formatting.\"}"
                     },
                     "web_purchase_url": null,
                     "weight": 50,
@@ -262258,7 +262258,7 @@
                             "title": "Monthly Subscription",
                             "is_consumable": false,
                             "product_id": "206c049f-bcfd-460d-8117-9f76ab4d4760",
-                            "vendor_product_id": "adapty.premium",
+                            "vendor_product_id": "xee.premium",
                             "promotional_offer_id": "pay_as_you_go.3months",
                             "win_back_offer_id": null,
                             "introductory_offer_eligibility": true,
@@ -284325,7 +284325,7 @@
                             "title": "Monthly Subscription",
                             "is_consumable": false,
                             "product_id": "206c049f-bcfd-460d-8117-9f76ab4d4760",
-                            "vendor_product_id": "adapty.premium",
+                            "vendor_product_id": "xee.premium",
                             "promotional_offer_id": "pay_as_you_go.3months",
                             "win_back_offer_id": null,
                             "introductory_offer_eligibility": true,
@@ -361680,7 +361680,7 @@
                             "title": "Week_good",
                             "is_consumable": false,
                             "product_id": "b7ab2dc0-0f27-4571-82f3-c78927591f1d",
-                            "vendor_product_id": "adapty.week_sub",
+                            "vendor_product_id": "xee.week_sub",
                             "promotional_offer_id": null,
                             "win_back_offer_id": null,
                             "introductory_offer_eligibility": true,
@@ -389765,7 +389765,7 @@
                     "custom_payload": null,
                     "remote_config": {
                         "lang": "en",
-                        "data": "{\"string1\":\"Welcome to <b>Adapty</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\",\"string2\":\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\",\"string3\":\"Your paywall #12345 has been showed on 2023-11-27.\",\"string4\":\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\",\"string5\":\"Check out our site: https://example.com for more details.\",\"string6\":\"Newlines and tabs:\\nThis is a new line.\\tThis is a tab.\",\"string7\":\"Use escape sequences like \\\\n, \\\\t, and \\\\\\\\ for special formatting.\"}"
+                        "data": "{\"string1\":\"Welcome to <b>Xee</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\",\"string2\":\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\",\"string3\":\"Your paywall #12345 has been showed on 2023-11-27.\",\"string4\":\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\",\"string5\":\"Check out our site: https://example.com for more details.\",\"string6\":\"Newlines and tabs:\\nThis is a new line.\\tThis is a tab.\",\"string7\":\"Use escape sequences like \\\\n, \\\\t, and \\\\\\\\ for special formatting.\"}"
                     },
                     "web_purchase_url": null,
                     "weight": 100,
@@ -412076,7 +412076,7 @@
                             "title": "Monthly Subscription",
                             "is_consumable": false,
                             "product_id": "206c049f-bcfd-460d-8117-9f76ab4d4760",
-                            "vendor_product_id": "adapty.premium",
+                            "vendor_product_id": "xee.premium",
                             "promotional_offer_id": "pay_as_you_go.3months",
                             "win_back_offer_id": null,
                             "introductory_offer_eligibility": true,
@@ -475164,7 +475164,7 @@
                     "custom_payload": null,
                     "remote_config": {
                         "lang": "en",
-                        "data": "{\"string1\":\"Welcome to <b>Adapty</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\",\"string2\":\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\",\"string3\":\"Your paywall #12345 has been showed on 2023-11-27.\",\"string4\":\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\",\"string5\":\"Check out our site: https://example.com for more details.\",\"string6\":\"Newlines and tabs:\\nThis is a new line.\\tThis is a tab.\",\"string7\":\"Use escape sequences like \\\\n, \\\\t, and \\\\\\\\ for special formatting.\"}"
+                        "data": "{\"string1\":\"Welcome to <b>Xee</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\",\"string2\":\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\",\"string3\":\"Your paywall #12345 has been showed on 2023-11-27.\",\"string4\":\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\",\"string5\":\"Check out our site: https://example.com for more details.\",\"string6\":\"Newlines and tabs:\\nThis is a new line.\\tThis is a tab.\",\"string7\":\"Use escape sequences like \\\\n, \\\\t, and \\\\\\\\ for special formatting.\"}"
                     },
                     "web_purchase_url": null,
                     "weight": 100,
@@ -482382,7 +482382,7 @@
                     "custom_payload": null,
                     "remote_config": {
                         "lang": "en",
-                        "data": "{\"string1\":\"Welcome to <b>Adapty</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\",\"string2\":\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\",\"string3\":\"Your paywall #12345 has been showed on 2023-11-27.\",\"string4\":\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\",\"string5\":\"Check out our site: https://example.com for more details.\",\"string6\":\"Newlines and tabs:\\nThis is a new line.\\tThis is a tab.\",\"string7\":\"Use escape sequences like \\\\n, \\\\t, and \\\\\\\\ for special formatting.\"}"
+                        "data": "{\"string1\":\"Welcome to <b>Xee</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\",\"string2\":\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\",\"string3\":\"Your paywall #12345 has been showed on 2023-11-27.\",\"string4\":\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\",\"string5\":\"Check out our site: https://example.com for more details.\",\"string6\":\"Newlines and tabs:\\nThis is a new line.\\tThis is a tab.\",\"string7\":\"Use escape sequences like \\\\n, \\\\t, and \\\\\\\\ for special formatting.\"}"
                     },
                     "web_purchase_url": null,
                     "weight": 30,
@@ -564320,7 +564320,7 @@
                     "custom_payload": null,
                     "remote_config": {
                         "lang": "en",
-                        "data": "{\"string1\":\"Welcome to <b>Adapty</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\",\"string2\":\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\",\"string3\":\"Your paywall #12345 has been showed on 2023-11-27.\",\"string4\":\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\",\"string5\":\"Check out our site: https://example.com for more details.\",\"string6\":\"Newlines and tabs:\\nThis is a new line.\\tThis is a tab.\",\"string7\":\"Use escape sequences like \\\\n, \\\\t, and \\\\\\\\ for special formatting.\"}"
+                        "data": "{\"string1\":\"Welcome to <b>Xee</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\",\"string2\":\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\",\"string3\":\"Your paywall #12345 has been showed on 2023-11-27.\",\"string4\":\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\",\"string5\":\"Check out our site: https://example.com for more details.\",\"string6\":\"Newlines and tabs:\\nThis is a new line.\\tThis is a tab.\",\"string7\":\"Use escape sequences like \\\\n, \\\\t, and \\\\\\\\ for special formatting.\"}"
                     },
                     "web_purchase_url": null,
                     "weight": 50,
@@ -609344,7 +609344,7 @@
                     "custom_payload": null,
                     "remote_config": {
                         "lang": "en",
-                        "data": "{\"qweqe\":{\"object.inner.baz\":\"string for\",\"list.0\":\"hello\",\"object.inner.baz1\":\"strings\"},\"qwe222\":\"\\\"Welcome to <b>Adapty</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\\\"\\n\\n\\\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\\\"\\n\\n\\\"Your paywall #12345 has been showed on 2023-11-27.\\\"\\n\\n\\\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\\\"\\n\\n\\\"Check out our site: https://example.com for more details.\\\"\\n\\n\\\"Newlines and tabs:\\\\nThis is a new line.\\\\tThis is a tab.\\\"\\n\\n\\\"Use escape sequences like \\\\\\\\n, \\\\\\\\t, and \\\\\\\\\\\\\\\\ for special formatting.\\\"\",\"test23\":\"This is a string to translate1\",\"test2\":\"This is a string to translate1\",\"qwe\":{\"string_key\":\"This is a string to the translate ewr\",\"list_key\":[\"Translate this items\",\"And this one too fam\"],\"object_key\":{\"nested_string\":\"Translate this nested strings\",\"nested_list\":[\"Translate me\",\"And me\"]},\"boolean_key\":true,\"number_key\":123,\"complex_object_key\":{\"translate_me\":\"This string should be translated\",\"translate_me1\":\"This string should be translated too\",\"do_not_translate\":false,\"number_to_ignore\":456}}}"
+                        "data": "{\"qweqe\":{\"object.inner.baz\":\"string for\",\"list.0\":\"hello\",\"object.inner.baz1\":\"strings\"},\"qwe222\":\"\\\"Welcome to <b>Xee</b>! Translate this <a href='https://xee.invalid/docs'>link</a>.\\\"\\n\\n\\\"Hello & welcome! Ensure that &lt; and &gt; are preserved.\\\"\\n\\n\\\"Your paywall #12345 has been showed on 2023-11-27.\\\"\\n\\n\\\"This is a test with emoji 😊👍 and special characters like ©, ®, ™, €.\\\"\\n\\n\\\"Check out our site: https://example.com for more details.\\\"\\n\\n\\\"Newlines and tabs:\\\\nThis is a new line.\\\\tThis is a tab.\\\"\\n\\n\\\"Use escape sequences like \\\\\\\\n, \\\\\\\\t, and \\\\\\\\\\\\\\\\ for special formatting.\\\"\",\"test23\":\"This is a string to translate1\",\"test2\":\"This is a string to translate1\",\"qwe\":{\"string_key\":\"This is a string to the translate ewr\",\"list_key\":[\"Translate this items\",\"And this one too fam\"],\"object_key\":{\"nested_string\":\"Translate this nested strings\",\"nested_list\":[\"Translate me\",\"And me\"]},\"boolean_key\":true,\"number_key\":123,\"complex_object_key\":{\"translate_me\":\"This string should be translated\",\"translate_me1\":\"This string should be translated too\",\"do_not_translate\":false,\"number_to_ignore\":456}}}"
                     },
                     "web_purchase_url": null,
                     "weight": 100,

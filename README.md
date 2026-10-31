@@ -1,6 +1,6 @@
 # XeeSDK-iOS
 
-iOS SDK for the Xee subscription server. Derived from the Adapty iOS SDK 3.17.3 (MIT License, Copyright (c) 2020 Adapty Tech Inc.): same structure and wire format (paths and JSON keys), renamed to Xee, with the paywall builder, onboardings, StoreKit 1 (iOS 13–14), web paywalls, cross-paywall tests, integration identifiers and promotional offer signing removed.
+iOS SDK for the Xee subscription server. It builds on MIT-licensed open-source code; LICENSE carries the upstream copyright notice.
 
 - Products: `Xee`, `XeeLogger` (Swift Package Manager only; iOS 15+, macOS 12+, visionOS 1+).
 - Public keys start with `xee_`. Requests send `Authorization: Api-Key <key>` and `xee-*` headers.
@@ -11,6 +11,6 @@ try await Xee.identify("customer-1")
 let profile = try await Xee.getProfile()
 ```
 
-Maintenance: `scripts/import-adapty.sh` + `strip-builder.py` + `rename.py` rebuild the sources from upstream; `scripts/audit.sh` fails if Adapty branding or hosts remain.
+Maintenance: `scripts/audit.sh` fails if an upstream name remains outside LICENSE.
 
 See LICENSE for the upstream notice.

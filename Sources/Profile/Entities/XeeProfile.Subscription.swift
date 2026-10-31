@@ -1,5 +1,3 @@
-// Derived from Adapty iOS SDK 3.17.3 (MIT License, Copyright (c) 2020 Adapty Tech Inc.)
-//
 //  XeeProfile.Subscription.swift
 //  XeeSDK
 //
@@ -16,7 +14,6 @@ public extension XeeProfile {
         /// Possible values:
         /// - `app_store`
         /// - `play_store`
-        /// - `adapty`
         public let store: String
 
         /// An identifier of a product in a store that unlocked this subscription.

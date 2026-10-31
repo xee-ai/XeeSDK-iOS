@@ -1,5 +1,3 @@
-// Derived from Adapty iOS SDK 3.17.3 (MIT License, Copyright (c) 2020 Adapty Tech Inc.)
-//
 //  XeeProfile.AccessLevel.swift
 //  XeeSDK
 //
@@ -24,7 +22,6 @@ public extension XeeProfile {
         /// Possible values:
         /// - `app_store`
         /// - `play_store`
-        /// - `adapty`
         public let store: String
 
         /// Time when this access level was activated.
