@@ -37,23 +37,6 @@ extension Backend {
         }
     }
 
-    static func canUseFallbackServer(_ error: HTTPError) -> Bool {
-        switch error {
-        case .perform:
-            false
-        case let .network(_, _, _, value):
-            (value as NSError).isTimedOutError
-        case let .decoding(_, _, statusCode, _, _, _),
-             let .backend(_, _, statusCode, _, _, _):
-            switch statusCode {
-            case 499, 500 ... 599:
-                true
-            default:
-                false
-            }
-        }
-    }
-
     // TODO: Retry Codes
     static func canRetryRequest(_ error: HTTPError) -> Bool {
         switch error {

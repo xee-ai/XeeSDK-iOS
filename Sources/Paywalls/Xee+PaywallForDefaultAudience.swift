@@ -77,9 +77,10 @@ extension Xee {
         _ paywallId: String,
         _ locale: XeeLocale
     ) async throws(XeeError) -> Content {
-        let (cached, isTestUser): (Content?, Bool) = {
-            guard let manager = try? profileManager(withProfileId: userId) else { return (nil, false) }
+        let (segmentId, cached, isTestUser): (String, Content?, Bool) = {
+            guard let manager = try? profileManager(withProfileId: userId) else { return ("", nil, false) }
             return (
+                manager.segmentId,
                 manager.paywallStorage.getPaywallById(
                     paywallId,
                     withLocale: locale,
@@ -89,15 +90,16 @@ extension Xee {
             )
         }()
 
-        do {
-            var chosen: XeePaywallChosen<Content> = try await httpConfigsSession.fetchPaywallVariationsForDefaultAudience(
+        // The server keeps no audiences: every profile gets the same variations, so this is the paywall route.
+        do throws(HTTPError) {
+            var chosen: XeePaywallChosen<Content> = try await httpSession.fetchPaywallVariations(
                 apiKeyPrefix: apiKeyPrefix,
                 userId: userId,
                 paywallId: paywallId,
                 locale: locale,
+                segmentId: segmentId,
                 cached: cached,
-                disableServerCache: isTestUser,
-                timeoutInterval: nil
+                disableServerCache: isTestUser
             )
 
             if let manager = try? profileManager(withProfileId: userId) {

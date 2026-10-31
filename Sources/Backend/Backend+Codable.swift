@@ -38,13 +38,13 @@ extension Backend {
 }
 
 private extension CodingUserInfoKey {
-    static let enableEncodingViewConfiguration = CodingUserInfoKey(rawValue: "adapty_encode_view_configuration")!
-    static let userId = CodingUserInfoKey(rawValue: "adapty_user_id")!
-    static let paywallId = CodingUserInfoKey(rawValue: "adapty_paywall_id")!
-    static let paywallVariationId = CodingUserInfoKey(rawValue: "adapty_paywall_variation_id")!
-    static let paywall = CodingUserInfoKey(rawValue: "adapty_paywall")!
+    static let enableEncodingViewConfiguration = CodingUserInfoKey(rawValue: "xee_encode_view_configuration")!
+    static let userId = CodingUserInfoKey(rawValue: "xee_user_id")!
+    static let paywallId = CodingUserInfoKey(rawValue: "xee_paywall_id")!
+    static let paywallVariationId = CodingUserInfoKey(rawValue: "xee_paywall_variation_id")!
+    static let paywall = CodingUserInfoKey(rawValue: "xee_paywall")!
     static let assignedVariation = CodingUserInfoKey(rawValue: "xee_assigned_variation")!
-    static let requestlocale = CodingUserInfoKey(rawValue: "adapty_request_locale")!
+    static let requestlocale = CodingUserInfoKey(rawValue: "xee_request_locale")!
 }
 
 extension CodingUserInfo {

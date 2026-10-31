@@ -31,6 +31,8 @@ extension Backend.Request {
     fileprivate static let appInstallIdHeaderKey = "xee-sdk-device-id"
     fileprivate static let crossSDKVersionHeaderKey = "xee-sdk-crossplatform-version"
     fileprivate static let crossSDKPlatformHeaderKey = "xee-sdk-crossplatform-name"
+    /// The server takes the device's IP address from the request unless this says not to.
+    fileprivate static let ipCollectionDisabledHeaderKey = "xee-ip-collection-disabled"
 
     static func globalHeadersWithStoreKit(_ configuration: XeeConfiguration, _ environment: Environment) -> HTTPHeaders {
         var headers = globalHeaders(configuration, environment)
@@ -56,6 +58,10 @@ extension Backend.Request {
         // The build picks which version of each paywall and view the server sends: the newest one
         // pushed for this build or an older one, so this build's code can read every key it gets.
         headers = headers.setAppBuild(environment.application.build)
+
+        if configuration.ipAddressCollectionDisabled {
+            headers[ipCollectionDisabledHeaderKey] = "true"
+        }
 
         if let crossPlatformSDK = configuration.crossPlatformSDK {
             headers[crossSDKPlatformHeaderKey] = crossPlatformSDK.name

@@ -10,10 +10,10 @@ import Testing
 @Suite struct ServerPaywallVariantDecodingTests {
     private let variant = { (id: String, weight: Int, cta: String) in
         """
-        {"type":"adapty_paywall_variant","id":"\(id)","attributes":{"paywall_variant_id":"\(id)","paywall_variant_name":"PaywallVariant \(cta)",
+        {"type":"paywall_variant","id":"\(id)","attributes":{"paywall_variant_id":"\(id)","paywall_variant_name":"PaywallVariant \(cta)",
          "variation_id":"\(id)","weight":\(weight),
          "remote_config":{"lang":"en","data":"{\\"title\\":\\"Go premium\\",\\"cta\\":\\"\(cta)\\"}"},
-         "products":[{"vendor_product_id":"com.example.yearly","adapty_product_id":"xee_com.example.yearly","access_level_id":"premium","product_type":"annual"}]}}
+         "products":[{"vendor_product_id":"com.example.yearly","product_id":"xee_com.example.yearly","access_level_id":"premium","product_type":"annual"}]}}
         """
     }
     private let meta = """
@@ -100,11 +100,11 @@ import Testing
         }
     }
 
-    @Test func theAssignmentAnswerDecodes() throws {
-        let some = try JSONDecoder().decode(PaywallAssignmentAnswer.self, from: Data(#"{"data":{"variation_id":"main.v2.B","paywall_audience_version_id":"t-1"}}"#.utf8))
-        #expect(some.data == PaywallAssignment(variationId: "main.v2.B", audienceVersionId: "t-1"))
-        let none = try JSONDecoder().decode(PaywallAssignmentAnswer.self, from: Data(#"{"data":null}"#.utf8))
-        #expect(none.data == nil)
+    @Test func theArmSentWithTheVariationsDecodes() throws {
+        let some = try JSONDecoder().decode(PaywallAssignedMeta.self, from: Data(#"{"data":[],"meta":{"paywall":{},"assigned":{"variation_id":"main.v2.B","paywall_audience_version_id":"t-1"}}}"#.utf8))
+        #expect(some.assigned == PaywallAssignment(variationId: "main.v2.B", audienceVersionId: "t-1"))
+        let none = try JSONDecoder().decode(PaywallAssignedMeta.self, from: Data(#"{"data":[],"meta":{"paywall":{}}}"#.utf8))
+        #expect(none.assigned == nil)
     }
 }
 #endif

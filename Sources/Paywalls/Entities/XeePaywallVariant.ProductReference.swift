@@ -27,7 +27,7 @@ extension XeePaywallVariant.ProductReference: CustomStringConvertible {
 extension XeePaywallVariant.ProductReference: Encodable {
     enum CodingKeys: String, CodingKey {
         case vendorId = "vendor_product_id"
-        case xeeProductId = "adapty_product_id"
+        case xeeProductId = "product_id"
         case promotionalOfferEligibility = "promotional_offer_eligibility"
         case promotionalOfferId = "promotional_offer_id"
         case winBackOfferId = "win_back_offer_id"

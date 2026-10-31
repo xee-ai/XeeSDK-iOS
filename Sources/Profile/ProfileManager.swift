@@ -131,7 +131,39 @@ final class ProfileManager {
         return !accessLevels.contains { $0.isActive && ($0.expiresAt.map { $0 <= now } ?? false) }
     }
 
+    /// The profile update on its way to the server; nil between updates.
+    private var syncing: Task<Result<XeeProfile, XeeError>, Never>?
+    /// Parameters that arrived while an update was on its way, sent together in the next one.
+    private var pendingParams: XeeProfileParameters?
+
+    /// One update at a time: a call made while one is on its way shares its answer, unless it brings
+    /// parameters, which go out together in a single follow-up. At launch the app's `getProfile`, the
+    /// return to the foreground and a storefront change would otherwise each send the profile.
     private func syncProfile(
+        params: XeeProfileParameters?
+    ) async throws(XeeError) -> XeeProfile {
+        if let params { pendingParams = pendingParams?.merged(with: params) ?? params }
+        while let running = syncing {
+            let result = await running.value
+            if pendingParams == nil { return try result.get() }
+        }
+        let sending = pendingParams
+        pendingParams = nil
+        let task = Task { @XeeActor in
+            let result: Result<XeeProfile, XeeError>
+            do throws(XeeError) {
+                result = try .success(await self.sendProfile(params: sending))
+            } catch {
+                result = .failure(error)
+            }
+            self.syncing = nil
+            return result
+        }
+        syncing = task
+        return try await task.value.get()
+    }
+
+    private func sendProfile(
         params: XeeProfileParameters?
     ) async throws(XeeError) -> XeeProfile {
         let analyticsDisabled = (params?.analyticsDisabled ?? false)
@@ -242,5 +274,24 @@ extension Xee {
             transactions: verifiedCurrentEntitlements,
             productManager: productsManager
         )
+    }
+}
+
+private extension XeeProfileParameters {
+    /// These parameters with `later`'s set values on top.
+    func merged(with later: XeeProfileParameters) -> XeeProfileParameters {
+        var merged = self
+        merged.firstName = later.firstName ?? firstName
+        merged.lastName = later.lastName ?? lastName
+        merged.gender = later.gender ?? gender
+        merged.birthday = later.birthday ?? birthday
+        merged.email = later.email ?? email
+        merged.phoneNumber = later.phoneNumber ?? phoneNumber
+        merged.storeCountry = later.storeCountry ?? storeCountry
+        merged.ipV4Address = later.ipV4Address ?? ipV4Address
+        merged.appTrackingTransparencyStatus = later.appTrackingTransparencyStatus ?? appTrackingTransparencyStatus
+        merged.codableCustomAttributes = later.codableCustomAttributes ?? codableCustomAttributes
+        merged.analyticsDisabled = later.analyticsDisabled ?? analyticsDisabled
+        return merged
     }
 }

@@ -49,9 +49,7 @@ extension Backend {
             for serverKind: XeeServerKind
         ) throws(BackendUnavailableError) {
             try checkIsBlocked(for: serverKind)
-            if serverKind != .fallback,
-               let expiresAt = requestBlockedUntil[requestName], expiresAt > Date()
-            {
+            if let expiresAt = requestBlockedUntil[requestName], expiresAt > Date() {
                 throw .blockedUntil(expiresAt)
             }
         }

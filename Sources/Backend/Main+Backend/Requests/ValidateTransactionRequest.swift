@@ -63,7 +63,7 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
     func encode(to encoder: Encoder) throws {
         var perentContainer = encoder.container(keyedBy: Backend.CodingKeys.self)
         var dataContainer = perentContainer.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
-        try dataContainer.encode("adapty_purchase_app_store_original_transaction_id_validation_result", forKey: .type)
+        try dataContainer.encode("transaction_validation", forKey: .type)
         var container = dataContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
 
         switch requestSource {

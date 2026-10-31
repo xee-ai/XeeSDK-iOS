@@ -48,7 +48,7 @@ private struct UpdateProfileRequest: BackendEncodableRequest {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: Backend.CodingKeys.self)
         var dataObject = container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
-        try dataObject.encode("adapty_analytics_profile", forKey: .type)
+        try dataObject.encode("analytics_profile", forKey: .type)
         try dataObject.encode(userId.profileId, forKey: .id)
 
         if let parameters {

@@ -10,7 +10,5 @@ import Foundation
 
 package enum XeeServerKind: Sendable, CaseIterable {
     case main
-    case fallback
-    case configs
     case ua
 }

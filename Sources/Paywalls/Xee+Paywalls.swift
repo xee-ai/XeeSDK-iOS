@@ -67,7 +67,7 @@ extension Xee {
         loadTimeout: TaskDuration
     ) async throws(XeeError) -> Content {
         do {
-            return try await fetchPaywallOrFallbackPaywall(
+            return try await fetchPaywallInTime(
                 paywallId,
                 locale,
                 fetchPolicy,
@@ -88,31 +88,28 @@ extension Xee {
         }
     }
 
-    private func fetchPaywallOrFallbackPaywall<Content: PaywallContent>(
+    /// The paywall from the server within `loadTimeout`; on a failure or a timeout the caller falls back to the cached
+    /// paywall or the app's fallback file.
+    private func fetchPaywallInTime<Content: PaywallContent>(
         _ paywallId: String,
         _ locale: XeeLocale,
         _ fetchPolicy: XeePaywallFetchPolicy,
         _ loadTimeout: TaskDuration
     ) async throws(XeeError) -> Content {
         // A first launch under a computed ID: the profile is still being made, but its ID is known and fixed, so the
-        // paywall is asked for now (the route that needs no profile) instead of after the server answers.
-        if let computed = creatingComputedUserId {
-            return try await fetchFallbackPaywall(
-                paywallId,
-                locale,
-                forUserId: computed,
-                withTimeout: loadTimeout.asTimeInterval
-            )
-        }
-
-        var userId = profileStorage.userId
-        let startTaskTime = Date()
+        // paywall is asked for now instead of after the server answers.
+        let computed = creatingComputedUserId
+        var userId = computed ?? profileStorage.userId
 
         do {
-            return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
+            return try await withThrowingTimeout(loadTimeout) {
+                if computed != nil {
+                    return try await self.fetchPaywall(paywallId, locale, forUserId: userId)
+                }
+
                 let createdUserId = try await self.createdProfileManager.userId
                 if createdUserId.isNotEqualProfileId(userId) {
-                    log.verbose("fetchPaywallOrFallbackPaywall: profile changed from \(userId) to \(createdUserId)")
+                    log.verbose("fetchPaywallInTime: profile changed from \(userId) to \(createdUserId)")
                     userId = createdUserId
                 }
 
@@ -123,19 +120,11 @@ extension Xee {
                     forUserId: userId
                 )
             }
-
         } catch let error as XeeError {
-            guard error.canUseFallbackServer else { throw error }
+            throw error
         } catch {
-            guard error is TimeoutError else { throw .unknown(error) }
+            throw .unknown(error)
         }
-
-        return try await fetchFallbackPaywall(
-            paywallId,
-            locale,
-            forUserId: userId,
-            withTimeout: loadTimeout.asTimeInterval + startTaskTime.timeIntervalSinceNow
-        )
     }
 
     private func fetchPaywall<Content: PaywallContent>(
@@ -171,8 +160,11 @@ extension Xee {
         forUserId userId: XeeUserId
     ) async throws(XeeError) -> Content {
         while !Task.isCancelled {
+            // No manager yet on a first launch under a computed ID: nothing cached, and the server needs no segment.
             let (segmentId, cached, isTestUser) = try { () throws(XeeError) in
-                let manager = try profileManager(withProfileId: userId).orThrows
+                guard let manager = try profileManager(withProfileId: userId) else {
+                    return ("", nil as Content?, false)
+                }
                 let cached: Content? = manager.paywallStorage
                     .getPaywallById(
                         paywallId,
@@ -183,8 +175,6 @@ extension Xee {
                 return (manager.segmentId, cached, manager.isTestUser)
             }()
 
-            let assigned = await assignedVariation(paywallId, userId)
-
             do throws(HTTPError) {
                 var chosen: XeePaywallChosen<Content> = try await httpSession.fetchPaywallVariations(
                     apiKeyPrefix: apiKeyPrefix,
@@ -193,14 +183,8 @@ extension Xee {
                     locale: locale,
                     segmentId: segmentId,
                     cached: cached,
-                    assigned: assigned,
                     disableServerCache: isTestUser
                 )
-
-                // A kept arm of an earlier test: forget it, the next fetch asks for the new test's.
-                if let assigned, case let .draw(draw) = chosen, assigned.audienceVersionId != draw.paywallAudienceVersionId {
-                    PaywallAssignmentStorage.clear(profileId: userId.profileId, paywallId: paywallId)
-                }
 
                 if let manager = try? profileManager(withProfileId: userId) {
                     chosen = manager.paywallStorage.savedPaywallChosen(chosen)
@@ -223,26 +207,10 @@ extension Xee {
         throw XeeError.taskCancelled()
 
         func updateSegmentId(for userId: XeeUserId, oldSegmentId: String) async throws(XeeError) -> Bool {
-            let manager = try profileManager(withProfileId: userId).orThrows
+            guard let manager = try profileManager(withProfileId: userId) else { return false }
             guard manager.segmentId == oldSegmentId else { return true }
             return await manager.fetchSegmentId() != oldSegmentId
         }
-    }
-
-    /// The server's arm for this paywall's running test: kept from an earlier answer, else asked for (2 s at most). Nil
-    /// on any failure or with no running test: the device then draws as before.
-    private func assignedVariation(_ paywallId: String, _ userId: XeeUserId) async -> PaywallAssignment? {
-        if let kept = PaywallAssignmentStorage.assignment(profileId: userId.profileId, paywallId: paywallId) {
-            return kept
-        }
-        let session = httpSession
-        let prefix = apiKeyPrefix
-        // `try?` flattens the optional: nil on an error, a timeout or no running test.
-        guard let answer = try? await withThrowingTimeout(.seconds(2), operation: {
-            try await session.fetchPaywallAssignment(apiKeyPrefix: prefix, userId: userId, paywallId: paywallId)
-        }) else { return nil }
-        PaywallAssignmentStorage.set(answer, profileId: userId.profileId, paywallId: paywallId)
-        return answer
     }
 
     func getCacheOrFallbackFilePaywall<Content: PaywallContent>(
@@ -272,59 +240,6 @@ extension Xee {
         Xee.trackEventIfNeed(chosen)
         return chosen.content
     }
-
-    private func fetchFallbackPaywall<Content: PaywallContent>(
-        _ paywallId: String,
-        _ locale: XeeLocale,
-        forUserId userId: XeeUserId,
-        withTimeout timeoutInterval: TimeInterval?
-    ) async throws(XeeError) -> Content {
-        var params: (cached: Content?, isTestUser: Bool)?
-        while !Task.isCancelled {
-            params = {
-                guard let manager = try? profileManager(withProfileId: userId) else { return nil }
-                return (
-                    cached: manager.paywallStorage.getPaywallById(
-                        paywallId,
-                        withLocale: locale,
-                        withVariationId: nil
-                    )?.value,
-                    isTestUser: manager.isTestUser
-                )
-            }() ?? params
-
-            if let cached = params?.cached {
-                return cached
-            }
-
-            do throws(HTTPError) {
-                var chosen: XeePaywallChosen<Content> = try await httpFallbackSession.fetchFallbackPaywallVariations(
-                    apiKeyPrefix: apiKeyPrefix,
-                    userId: userId,
-                    paywallId: paywallId,
-                    locale: locale,
-                    cached: params?.cached,
-                    disableServerCache: params?.isTestUser ?? false,
-                    timeoutInterval: timeoutInterval
-                )
-
-                if let manager = try? profileManager(withProfileId: userId) {
-                    chosen = manager.paywallStorage.savedPaywallChosen(chosen)
-                }
-
-                Xee.trackEventIfNeed(chosen)
-                return chosen.content
-
-            } catch {
-                if error.has(decodingError: [.notFoundVariationId]) {
-                    continue
-                } else {
-                    throw error.asXeeError
-                }
-            }
-        }
-        throw XeeError.taskCancelled()
-    }
 }
 
 extension TimeInterval {
@@ -342,16 +257,6 @@ extension TimeInterval {
 private extension Error {}
 
 private extension XeeError {
-    var canUseFallbackServer: Bool {
-        if let error = wrapped as? HTTPError,
-           Backend.canUseFallbackServer(error)
-        {
-            true
-        } else {
-            false
-        }
-    }
-
     var isProfileWasChanged: Bool {
         if let error = wrapped as? InternalXeeError,
            case .profileWasChanged = error

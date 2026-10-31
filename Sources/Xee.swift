@@ -18,8 +18,6 @@ public final class Xee {
 
     let backend: Backend
     let httpSession: Backend.MainExecutor
-    let httpFallbackSession: Backend.FallbackExecutor
-    let httpConfigsSession: Backend.ConfigsExecutor
 
     let transactionManager: StoreKitTransactionManager
     let productsManager: StoreKitProductsManager
@@ -38,8 +36,6 @@ public final class Xee {
         self.backend = backend
         self.profileStorage = ProfileStorage()
         self.httpSession = backend.createDefaultExecutor()
-        self.httpFallbackSession = backend.createFallbackExecutor()
-        self.httpConfigsSession = backend.createConfigsExecutor()
 
         let productVendorIdsStorage = BackendProductInfoStorage()
         await PurchasePayloadStorage.migration(for: ProfileStorage.userId)
@@ -68,7 +64,6 @@ public final class Xee {
                 storage: purchasePayloadStorage
             )
         }
-        startSyncIPv4OnceIfNeeded()
     }
 
     private var sharedProfileManager: ProfileManager.Shared?

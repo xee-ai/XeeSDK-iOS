@@ -9,7 +9,7 @@ import Testing
 @Suite struct ServerProfileDecodingTests {
     @Test func theServersProfileResponseDecodes() throws {
         let json = """
-        {"data":{"type":"adapty_analytics_profile","id":"11111111-1111-4111-8111-111111111111","attributes":{
+        {"data":{"type":"analytics_profile","id":"11111111-1111-4111-8111-111111111111","attributes":{
           "profile_id":"11111111-1111-4111-8111-111111111111","customer_user_id":null,
           "store_account_token":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","segment_hash":"default",
           "paid_access_levels":{"premium":{"id":"premium","is_active":true,"vendor_product_id":"com.example.monthly","store":"app_store",

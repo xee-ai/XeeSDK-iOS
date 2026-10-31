@@ -36,7 +36,7 @@ private struct SetASATokenRequest: BackendEncodableRequest {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: Backend.CodingKeys.self)
         var dataObject = container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
-        try dataObject.encode("adapty_attribution_asa", forKey: .type)
+        try dataObject.encode("attribution_asa", forKey: .type)
         var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
         try attributesObject.encode(token, forKey: .token)
     }

@@ -179,7 +179,7 @@ public extension XeeConfiguration.Builder {
         return self
     }
 
-    /// The server Xee talks to, for every kind of request: API, configuration and fallback.
+    /// The server Xee talks to, for every kind of request: the API and user acquisition.
     @discardableResult
     func with(serverUrl url: URL) -> Self {
         for kind in XeeServerKind.allCases {

@@ -14,8 +14,7 @@ extension XeePaywallChosen {
         withUserId userId: XeeUserId,
         withPaywallId paywallId: String,
         withRequestLocale requestLocale: XeeLocale,
-        withCached cached: Content?,
-        withAssigned assigned: PaywallAssignment? = nil
+        withCached cached: Content?
     ) -> HTTPDecoder<XeePaywallChosen> {
         return decoder
 
@@ -41,7 +40,10 @@ extension XeePaywallChosen {
             jsonDecoder.userInfo.setPaywall(paywall)
             jsonDecoder.userInfo.setUserId(userId)
             jsonDecoder.userInfo.setRequestLocale(requestLocale)
-            if let assigned { jsonDecoder.userInfo.setAssignedVariation(assigned) }
+            // The server's arm for this profile in the running test, sent with the variations.
+            if let assigned = (try? jsonDecoder.decode(PaywallAssignedMeta.self, from: body))?.assigned {
+                jsonDecoder.userInfo.setAssignedVariation(assigned)
+            }
 
             let draw = try jsonDecoder.decode(
                 Backend.Response.Data<XeePaywall.Draw<Content>>.self,

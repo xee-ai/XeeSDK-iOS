@@ -40,7 +40,7 @@ extension Environment {
 
         enum CodingKeys: String, CodingKey {
             case appInstallId = "device_id"
-            case SDKVersion = "adapty_sdk_version"
+            case SDKVersion = "sdk_version"
             case appBuild = "app_build"
             case appVersion = "app_version"
             case webUserAgent = "user_agent"
