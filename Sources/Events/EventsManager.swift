@@ -53,7 +53,7 @@ final class EventsManager {
         let state = await backend.networkManager.currentState
         configuration = .init(state)
         observeBackground()
-        guard !database.isEmpty || configuration.isExpired else { return }
+        guard !database.isEmpty else { return }
         needSendEvents(gather: false)
     }
 

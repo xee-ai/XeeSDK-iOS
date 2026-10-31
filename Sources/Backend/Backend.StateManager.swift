@@ -11,66 +11,20 @@ import Foundation
 extension Backend {
     @BackendActor
     final class StateManager {
-        private let apiKeyPrefix: String
-
         private let cluster: XeeServerCluster
         private let devBaseUrls: [XeeServerKind: URL]?
-        private let session: HTTPSession
 
         private var mainBaseUrlIndex: Int
-        var currentState: BackendState
-        private var storage = BackendStateStorage()
-        private var syncing: Task<Void, Never>?
+        /// The SDK's own API addresses and blocked events; nothing fetches them (the server has no net-config).
+        let currentState = BackendState.createDefault()
         private var serverBlockedByKind = Set<XeeServerKind>()
         private var requestBlockedUntil = [BackendRequestName: Date]()
 
         init(with configuration: XeeConfiguration) {
             let backend = configuration.backend
-            apiKeyPrefix = configuration.apiKeyPrefix
             cluster = backend.cluster
             devBaseUrls = backend.devBaseUrls
-            session = .init(configuration: FallbackHTTPConfiguration(with: configuration))
-
-            if let state = storage.state {
-                currentState = state
-            } else {
-                let state = BackendState.createDefault()
-                storage.set(state: state)
-                currentState = state
-            }
             mainBaseUrlIndex = 0
-        }
-
-        private func syncState() async {
-            let task: Task<Void, Never>
-            if let syncing {
-                task = syncing
-            } else {
-                task = Task.detached { try? await self.fetchState() }
-                syncing = task
-            }
-            await task.value
-        }
-
-        private func fetchState() async throws {
-            defer { syncing = nil }
-
-            try checkIsBlocked(for: .fallback)
-            let baseUrl = devBaseUrls[.fallback, with: cluster]
-
-            do {
-                currentState = try await DefaultBackendExecutor.fetchBackendState(
-                    withBaseUrl: baseUrl,
-                    withSession: session,
-                    apiKeyPrefix: apiKeyPrefix
-                )
-                storage.set(state: currentState)
-                mainBaseUrlIndex = 0
-            } catch {
-                currentState = currentState.extended()
-                storage.set(state: currentState)
-                throw error
-            }
         }
 
         private func checkIsBlocked(
@@ -86,7 +40,7 @@ extension Backend {
             }
 
             if serverKind == .main, !currentState.mainBaseUrlsExist(by: cluster) {
-                throw .blockedUntil(currentState.expiresAt)
+                throw .blockedUntil(nil)
             }
         }
 
@@ -149,10 +103,7 @@ extension Backend.StateManager {
     }
 
     func fetchCurrentState() async -> BackendState {
-        if currentState.isExpired {
-            await syncState()
-        }
-        return currentState
+        currentState
     }
 
     func baseUrl(
@@ -165,12 +116,8 @@ extension Backend.StateManager {
         }
         if let url = devBaseUrls?[serverKind] { return url }
 
-        if currentState.isExpired {
-            await syncState()
-        }
-
         guard let url = currentState.mainBaseUrl(by: cluster, withIndex: mainBaseUrlIndex) else {
-            throw .blockedUntil(currentState.expiresAt)
+            throw .blockedUntil(nil)
         }
         return url
     }

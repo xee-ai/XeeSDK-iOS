@@ -10,21 +10,12 @@ import Foundation
 
 struct EventsBackendConfiguration: Sendable {
     var blacklist: Set<String>
-    let expiresAt: Date
 
     init(_ state: BackendState) {
         blacklist = state.eventBlacklist
-        expiresAt = state.expiresAt
     }
 
     init() {
         blacklist = Set<String>()
-        expiresAt = Date(timeIntervalSince1970: 0)
-    }
-}
-
-extension EventsBackendConfiguration {
-    var isExpired: Bool {
-        expiresAt <= Date()
     }
 }

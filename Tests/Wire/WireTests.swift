@@ -40,13 +40,6 @@ final class RecordingURLProtocol: URLProtocol, @unchecked Sendable {
             return ["data": [Any]()]
         case path.contains("/cross-paywall-info"):
             return ["data": ["paywall_with_variation_map": [String: Any](), "version": 1]]
-        case path.hasSuffix("/net-config.json"):
-            return ["data": [
-                "event_blacklist": [String](),
-                "api_endpoints": ["default": ["https://server.example.test/api/v1"]],
-                "expires_in": 3_600_000,
-                "retry_interval": 1_800_000,
-            ] as [String: Any]]
         case path.hasSuffix("/attribution/install"):
             return ["data": ["install_id": "install-1"]]
         default:

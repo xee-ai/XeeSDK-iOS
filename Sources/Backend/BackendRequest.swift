@@ -35,7 +35,6 @@ enum BackendRequestName: String {
     case sendASAToken = "set_asa_token"
     case setAttributionData = "set_attribution_data"
 
-    case fetchNetworkConfig = "get_net_config"
 
     case fetchAllProductInfo = "get_all_products_info"
 

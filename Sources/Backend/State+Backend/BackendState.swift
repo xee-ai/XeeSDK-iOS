@@ -11,8 +11,6 @@ import Foundation
 struct BackendState: Sendable {
     let eventBlacklist: Set<String>
     let mainBaseUrls: [XeeServerCluster: [URL]]
-    let expiresAt: Date
-    let extendSeconds: TimeInterval
 }
 
 extension BackendState {
@@ -23,23 +21,8 @@ extension BackendState {
                 .default: [Backend.defaultBaseUrl(kind: .main, by: .default)],
                 .eu: [Backend.defaultBaseUrl(kind: .main, by: .eu)],
                 .cn: [Backend.defaultBaseUrl(kind: .main, by: .cn)]
-            ],
-            expiresAt: Date(timeIntervalSince1970: 0),
-            extendSeconds: 1800
+            ]
         )
-    }
-
-    func extended(now: Date = Date()) -> Self {
-        .init(
-            eventBlacklist: eventBlacklist,
-            mainBaseUrls: mainBaseUrls,
-            expiresAt: now.addingTimeInterval(extendSeconds),
-            extendSeconds: extendSeconds
-        )
-    }
-
-    var isExpired: Bool {
-        expiresAt <= Date()
     }
 
     func mainBaseUrlsExist(by cluster: XeeServerCluster) -> Bool {
@@ -65,59 +48,5 @@ extension BackendState {
         }
 
         return baseUrls[index].appendingDefaultPathIfNeed
-    }
-}
-
-extension BackendState: Codable {
-    enum CodingKeys: String, CodingKey {
-        case eventBlacklist = "event_blacklist"
-        case mainBaseUrls = "api_endpoints"
-        case expiresAt = "expires_at"
-        case expiresIn = "expires_in"
-        case extendSeconds = "retry_interval"
-    }
-
-    struct SafeURL: Codable {
-        let url: URL?
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.singleValueContainer()
-            let str = try container.decode(String.self)
-            url = URL(string: str)
-        }
-    }
-
-    init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        eventBlacklist = try container.decode(Set<String>.self, forKey: .eventBlacklist)
-
-        let mainBaseUrlsContainer = try container.nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .mainBaseUrls)
-        mainBaseUrls = try mainBaseUrlsContainer
-            .allKeys
-            .reduce(into: [:]) { result, key in
-                guard let cluster = XeeServerCluster(rawValue: key.stringValue) else { return }
-                result[cluster] = try mainBaseUrlsContainer.decode([String].self, forKey: key)
-                    .compactMap(URL.init)
-            }
-        if container.contains(.expiresAt) {
-            expiresAt = try Date(timeIntervalSince1970: (container.decode(Double.self, forKey: .expiresAt)) / 1000.0)
-        } else {
-            let expiresIn = try container.decode(Double.self, forKey: .expiresIn) / 1000.0
-            expiresAt = Date().addingTimeInterval(expiresIn)
-        }
-        extendSeconds = try container.decode(Double.self, forKey: .extendSeconds) / 1000.0
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(eventBlacklist, forKey: .eventBlacklist)
-        var mainBaseUrlsContainer = container.nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .mainBaseUrls)
-        for (cluster, urls) in mainBaseUrls {
-            let key = AnyCodingKeys(stringValue: cluster.rawValue)
-            let urlStrings = urls.map(\.absoluteString)
-            try mainBaseUrlsContainer.encode(urlStrings, forKey: key)
-        }
-        try container.encode(expiresAt.timeIntervalSince1970 * 1000.0, forKey: .expiresAt)
-        try container.encode(extendSeconds * 1000.0, forKey: .extendSeconds)
     }
 }
