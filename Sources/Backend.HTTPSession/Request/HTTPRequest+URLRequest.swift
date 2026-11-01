@@ -33,6 +33,10 @@ extension HTTPRequest {
         )
 
         request.httpMethod = endpoint.method.rawValue
+        // api.xee.ai speaks HTTP/3: QUIC sets up the connection and TLS in one round trip instead of
+        // TCP's two, and the ephemeral session would forget the server's alt-svc on every launch.
+        // Where UDP is blocked, URLSession falls back to TCP.
+        request.assumesHTTP3Capable = true
 
         headers.forEach {
             request.setValue($1, forHTTPHeaderField: $0)
