@@ -12,6 +12,9 @@ protocol HTTPRequest: Sendable {
     var queryItems: QueryItems { get }
     var cachePolicy: URLRequest.CachePolicy? { get }
     var timeoutInterval: TimeInterval? { get }
+    /// Safe to send twice, and the app has a saved answer to fall back on (the profile GET): it waits for the server
+    /// 5 seconds (2 after a timeout, `FailFastTimeout`) and is sent a second time when it is slow (`hedgeReadsAfter`).
+    var isQuickRead: Bool { get }
     var stamp: String { get }
 }
 
@@ -22,4 +25,5 @@ extension HTTPRequest {
     var queryItems: QueryItems { [] }
     var cachePolicy: URLRequest.CachePolicy? { nil }
     var timeoutInterval: TimeInterval? { nil }
+    var isQuickRead: Bool { false }
 }

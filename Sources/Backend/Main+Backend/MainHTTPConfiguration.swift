@@ -9,6 +9,9 @@ import Foundation
 struct MainHTTPConfiguration: HTTPCodableConfiguration {
     let sessionConfiguration: URLSessionConfiguration
 
+    /// Above the p95 of a profile read (about 0.2 to 0.3 s over 3,000 reads), so about 2 to 3 % of reads are sent twice.
+    let hedgeReadsAfter: TaskDuration? = .milliseconds(350)
+
     let defaultEncodedContentType = "application/vnd.api+json"
 
     func configure(jsonDecoder: JSONDecoder) { Backend.configure(jsonDecoder: jsonDecoder) }

@@ -11,6 +11,8 @@ private struct FetchProfileRequest: BackendRequest {
     let headers: HTTPHeaders
     let stamp = Log.stamp
     let requestName = BackendRequestName.fetchProfile
+    /// Idempotent, and a failed read falls back to the saved profile (`ProfileManager.fetchProfile`).
+    let isQuickRead = true
 
     init(userId: XeeUserId, responseHash: String?) {
         endpoint = HTTPEndpoint(
