@@ -9,8 +9,9 @@ import Foundation
 struct MainHTTPConfiguration: HTTPCodableConfiguration {
     let sessionConfiguration: URLSessionConfiguration
 
-    /// Above the p95 of a profile read (about 0.2 to 0.3 s over 3,000 reads), so about 2 to 3 % of reads are sent twice.
-    let hedgeReadsAfter: TaskDuration? = .milliseconds(350)
+    /// A profile read not answered after one second is sent again on its own connection. About 0.7 % of 3,000 reads took
+    /// longer than that on a Wi-Fi that stalls about 1 % of them, so about that share is sent twice.
+    let hedgeReadsAfter: TaskDuration? = .seconds(1)
 
     let defaultEncodedContentType = "application/vnd.api+json"
 
