@@ -44,3 +44,19 @@ func withThrowingTimeout<T: Sendable>(
 
     return try result.get()
 }
+
+/// Whether `work` ended, successfully or not, within `budget`. When it did not, the caller goes on without it:
+/// `work` is cancelled, which for `Xee.createdProfileManager` only stops the wait, not the profile being made.
+func finishes(
+    within budget: TaskDuration,
+    _ work: sending @escaping @isolated(any) () async throws -> Void
+) async -> Bool {
+    do {
+        try await withThrowingTimeout(budget, operation: work)
+    } catch is TimeoutError {
+        return false
+    } catch {
+        return true
+    }
+    return true
+}

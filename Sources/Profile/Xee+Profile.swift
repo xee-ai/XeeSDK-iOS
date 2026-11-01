@@ -26,6 +26,26 @@ public extension Xee {
         }
     }
 
+    /// Like ``getProfile(maxAge:)``, with a choice of how the saved profile is used.
+    ///
+    /// - `.maxAge(seconds)`: exactly ``getProfile(maxAge:)``.
+    /// - `.savedThenRefresh`: returns the saved profile at once, even from an earlier launch, and refreshes it
+    ///   behind the answer; the refreshed profile reaches the app through `didLoadLatestProfile`. Use it where the
+    ///   screen should not wait, such as showing premium access at launch. The server is asked first, as with
+    ///   `getProfile()`, when no profile was confirmed in the last 7 days or when an access level reported as active
+    ///   has reached its `expiresAt`, so access never outlives its end date. A refund or a change made in the
+    ///   dashboard can reach the app one launch late. On a first launch, while the profile is still being made
+    ///   after one second, it returns the access StoreKit verifies on the device, and the made profile arrives
+    ///   through `didLoadLatestProfile`.
+    nonisolated static func getProfile(policy: XeeProfilePolicy) async throws(XeeError) -> XeeProfile {
+        try await withActivatedSDK(methodName: .getProfile) { sdk throws(XeeError) in
+            if case .savedThenRefresh = policy, let answer = await sdk.profileWhileCreating(budget: Xee.creatingProfileBudget) {
+                return answer
+            }
+            return try await sdk.createdProfileManager.fetchProfile(policy: policy)
+        }
+    }
+
     /// How old, in seconds, the saved profile may be when ``getProfile(maxAge:)`` is called without `maxAge`.
     nonisolated static let defaultProfileMaxAge: TimeInterval = 300
 
@@ -39,4 +59,12 @@ public extension Xee {
             _ = try await sdk.createdProfileManager.updateProfile(params: params)
         }
     }
+}
+
+/// How ``Xee/getProfile(policy:)`` uses the saved profile.
+public enum XeeProfilePolicy: Sendable {
+    /// The saved profile when the server confirmed it less than this many seconds ago, else a fresh one.
+    case maxAge(TimeInterval)
+    /// The saved profile at once, refreshed behind the answer.
+    case savedThenRefresh
 }

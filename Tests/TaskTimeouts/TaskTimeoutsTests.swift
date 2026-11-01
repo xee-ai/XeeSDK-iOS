@@ -63,3 +63,30 @@ struct TaskTimeoutsTests {
 }
 
 #endif
+
+#if canImport(Testing)
+
+/// `finishes(within:)`: first launch answers from StoreKit when the create request is slower than its budget.
+struct FinishesWithinTests {
+    let budget: TaskDuration = .milliseconds(500)
+
+    @Test func workThatEndsInTimeFinishes() async {
+        let done = await finishes(within: budget) { try await Task.sleep(nanoseconds: 10_000_000) }
+        #expect(done)
+    }
+
+    @Test func workThatEndsLateDoesNotFinishAndTheCallDoesNotWaitForIt() async {
+        let start = Date()
+        let done = await finishes(within: budget) { try await Task.sleep(nanoseconds: 2 * budget.asNanoseconds) }
+        #expect(!done)
+        #expect(Date().timeIntervalSince(start) < 1.5 * budget.asTimeInterval)
+    }
+
+    @Test func workThatFailsInTimeCountsAsFinished() async {
+        struct Failure: Error {}
+        let done = await finishes(within: budget) { throw Failure() }
+        #expect(done)
+    }
+}
+
+#endif

@@ -17,6 +17,7 @@ final class ProfileStorage {
         static let externalAnalyticsDisabledKey = "XeeSDK_External_Analytics_Disabled"
         static let syncedTransactionsHistoryKey = "XeeSDK_Synced_Bundle_Receipt"
         static let appleSearchAdsSyncDateKey = "XeeSDK_Apple_Search_Ads_Sync_Date"
+        static let profileConfirmedKey = "XeeSDK_Profile_Confirmed_At"
     }
 
     private static let userDefaults = Storage.userDefaults
@@ -81,6 +82,20 @@ final class ProfileStorage {
         }
     }
 
+    /// When the server last confirmed the saved profile, kept with the profile's ID so a different profile never
+    /// borrows it. Lets a later launch answer from the saved profile and refresh it behind the answer.
+    private static func profileConfirmedAt(for profileId: String) -> Date? {
+        guard let saved = userDefaults.dictionary(forKey: Constants.profileConfirmedKey),
+              saved["id"] as? String == profileId,
+              let at = saved["at"] as? TimeInterval
+        else { return nil }
+        return Date(timeIntervalSince1970: at)
+    }
+
+    private static func setProfileConfirmedAt(_ date: Date, for profileId: String) {
+        userDefaults.set(["id": profileId, "at": date.timeIntervalSince1970], forKey: Constants.profileConfirmedKey)
+    }
+
     private static var appAccountToken: UUID? =
         userDefaults.string(forKey: Constants.appAccountTokenKey).flatMap(UUID.init)
 
@@ -131,6 +146,7 @@ final class ProfileStorage {
             userId = createAnonymousUserId()
             profile = nil
             userDefaults.removeObject(forKey: Constants.profileKey)
+            userDefaults.removeObject(forKey: Constants.profileConfirmedKey)
         }
 
         userDefaults.removeObject(forKey: Constants.appAccountTokenKey)
@@ -194,6 +210,15 @@ extension ProfileStorage {
     func profile(for userId: XeeUserId) throws(WrongProfileIdError) -> VH<XeeProfile>? {
         try checkProfileId(userId)
         return profile
+    }
+
+    /// Nil when the server never confirmed this profile (an earlier SDK version saved it, or it is another profile).
+    func profileConfirmedAt(for userId: XeeUserId) -> Date? {
+        Self.profileConfirmedAt(for: userId.profileId)
+    }
+
+    func setProfileConfirmedAt(_ date: Date, for userId: XeeUserId) {
+        Self.setProfileConfirmedAt(date, for: userId.profileId)
     }
 
     func updateProfile(_ profile: VH<XeeProfile>) throws(WrongProfileIdError) {

@@ -106,6 +106,16 @@ public extension Xee {
         }
     }
 
+    /// Like ``getProfile(maxAge:_:)``, with a choice of how the saved profile is used. See ``getProfile(policy:)``.
+    nonisolated static func getProfile(
+        policy: XeeProfilePolicy,
+        _ completion: @escaping XeeResultCompletion<XeeProfile>
+    ) {
+        withCompletion(completion) { () async throws(XeeError) in
+            try await getProfile(policy: policy)
+        }
+    }
+
     /// You can set optional attributes such as email, phone number, etc, to the user of your app. You can then use attributes to create user [segments](https://xee.invalid/docs) or just view them in CRM.
     ///
     /// Read more on the [Xee Documentation](https://xee.invalid/docs)

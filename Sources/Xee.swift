@@ -342,6 +342,22 @@ extension Xee {
         return next.userId
     }
 
+    /// How long `getProfile(policy: .savedThenRefresh)` waits for a profile that is still being made.
+    static let creatingProfileBudget: TaskDuration = .seconds(1)
+
+    /// While a profile is being made (a first launch, `identify`, `logout`), the profile the app can show at once: the
+    /// one it will have, with the access StoreKit verifies on the device (what an offline device gets). Nil when the
+    /// profile exists, was made within `budget`, or could not be made (the caller then goes the normal way and meets
+    /// the result or the error). It holds no `storeAccountToken`, and a purchase, `identify` or a paywall still waits
+    /// for the created profile. The made profile reaches the app through `didLoadLatestProfile`.
+    func profileWhileCreating(budget: TaskDuration) async -> XeeProfile? {
+        guard let offline = offlineProfileManager else { return nil }
+        let created = await finishes(within: budget) { [self] in _ = try await createdProfileManager }
+        guard !created else { return nil }
+        log.info("the profile is still being made after \(budget); answering with the access StoreKit verifies")
+        return await profileWithOfflineAccessLevels(offline.currentProfile)
+    }
+
     var createdProfileManager: ProfileManager {
         get async throws(XeeError) {
             switch sharedProfileManager {

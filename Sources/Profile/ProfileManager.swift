@@ -14,6 +14,8 @@ final class ProfileManager {
     /// When the server last confirmed `cachedProfile`, in this launch. Nil until then, so the first
     /// `getProfile(maxAge:)` after launch, `identify` or `logout` always asks the server.
     private var syncedAt: Date?
+    /// When the server last confirmed `cachedProfile`, in this launch or an earlier one (kept in storage).
+    private var confirmedAt: Date?
     private var onceSentEnvironment: SentEnvironment
     private let storage: ProfileStorage
 
@@ -34,6 +36,7 @@ final class ProfileManager {
         self.cachedProfile = profile
         self.onceSentEnvironment = sentEnvironment
         self.storage = storage
+        self.confirmedAt = storage.profileConfirmedAt(for: profile.userId)
 
         Task { @XeeActor [weak self] in
             guard let sdk = Xee.optionalSDK else { return }
@@ -54,7 +57,7 @@ final class ProfileManager {
         _ newProfile: VH<XeeProfile>
     ) throws(WrongProfileIdError) -> Task<XeeProfile, Never>? {
         guard newProfile.isEqualProfileId(userId) else { throw WrongProfileIdError() }
-        syncedAt = Date()
+        markSynced()
 
         if newProfile.IsNotEqualHash(cachedProfile),
            newProfile.isNewerOrEqualVersion(cachedProfile)
@@ -115,6 +118,62 @@ final class ProfileManager {
             return await profileWithOfflineAccessLevels
         }
         return await fetchProfile()
+    }
+
+    /// The server confirmed the saved profile just now.
+    private func markSynced() {
+        let now = Date()
+        syncedAt = now
+        confirmedAt = now
+        storage.setProfileConfirmedAt(now, for: userId)
+    }
+
+    /// How long after the server last confirmed it a saved profile may be answered from without asking first.
+    nonisolated static let savedProfileMaxAge: TimeInterval = 7 * 24 * 3600
+
+    /// How old a confirmation may be before `.savedThenRefresh` refreshes behind its answer: `getProfile`'s default.
+    nonisolated static let refreshAfter: TimeInterval = Xee.defaultProfileMaxAge
+
+    enum SavedAnswer: Equatable {
+        case askServer
+        /// Answer with the saved profile; `refresh`: also ask the server behind the answer.
+        case saved(refresh: Bool)
+    }
+
+    /// What `.savedThenRefresh` does (the shape of RevenueCat's `cachedOrFetched`). The saved profile is answered at once,
+    /// whatever its age within `savedProfileMaxAge`, but never when an access it reports as active has reached its end:
+    /// a cache must never keep access alive. A profile the server never confirmed, or confirmed in the future by a
+    /// changed clock, goes to the server.
+    nonisolated static func savedAnswer(
+        confirmedAt: Date?,
+        syncedAt: Date?,
+        accessLevels: [(isActive: Bool, expiresAt: Date?)],
+        now: Date
+    ) -> SavedAnswer {
+        guard let confirmedAt else { return .askServer }
+        let age = now.timeIntervalSince(confirmedAt)
+        guard age >= 0, age < savedProfileMaxAge else { return .askServer }
+        if accessLevels.contains(where: { $0.isActive && ($0.expiresAt.map { $0 <= now } ?? false) }) { return .askServer }
+        let freshThisLaunch = isFresh(syncedAt: syncedAt, maxAge: refreshAfter, accessLevels: accessLevels, now: now)
+        return .saved(refresh: !freshThisLaunch)
+    }
+
+    /// The saved profile at once, and a refresh behind it that reaches the app through `didLoadLatestProfile`.
+    func fetchProfile(policy: XeeProfilePolicy) async -> XeeProfile {
+        switch policy {
+        case let .maxAge(seconds):
+            return await fetchProfile(maxAge: seconds)
+        case .savedThenRefresh:
+            let levels = cachedProfile.value.accessLevels.values.map { (isActive: $0.isActive, expiresAt: $0.expiresAt) }
+            switch Self.savedAnswer(confirmedAt: confirmedAt, syncedAt: syncedAt, accessLevels: levels, now: Date()) {
+            case .askServer:
+                return await fetchProfile()
+            case let .saved(refresh):
+                // Calls made while a refresh is on its way share it (`syncing`).
+                if refresh { Task { @XeeActor [weak self] in _ = await self?.fetchProfile() } }
+                return await profileWithOfflineAccessLevels
+            }
+        }
     }
 
     /// A saved profile can stand in for the server's answer only while it is younger than `maxAge` and
@@ -203,7 +262,7 @@ final class ProfileManager {
             return profile
         }
         // No body: the server says the saved profile is still current.
-        if response == nil { syncedAt = Date() }
+        if response == nil { markSynced() }
 
         return await profileWithOfflineAccessLevels
     }
