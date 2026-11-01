@@ -10,27 +10,63 @@ final class HTTPSession: Sendable {
     let configuration: HTTPConfiguration
 
     private let _responseValidator: HTTPDataResponse.Validator
-    private let _session: URLSession
-    private let _state: HTTPSessionState
-    private let _delegate: URLSession.Delegate
+    private let _lanes: Lanes
     private let _requestSign: Sign?
     private let _failFast = FailFastTimeout()
-    /// A second session, so a hedged read gets its own connection instead of queueing behind a stalled one.
-    private let _hedge: Lane?
 
+    typealias Sign = @Sendable (URLRequest, HTTPEndpoint) throws -> URLRequest
+
+    /// One URLSession with its own state and connection.
     private struct Lane: Sendable {
         let session: URLSession
         let state: HTTPSessionState
         let delegate: URLSession.Delegate
+
+        init(_ configuration: HTTPConfiguration) {
+            let state = HTTPSessionState()
+            let delegate = URLSession.Delegate(sessionState: state, configuration: configuration)
+            session = URLSession(configuration: configuration.sessionConfiguration, delegate: delegate, delegateQueue: nil)
+            self.state = state
+            self.delegate = delegate
+        }
     }
 
-    private static func lane(_ configuration: HTTPConfiguration) -> Lane {
-        let state = HTTPSessionState()
-        let delegate = URLSession.Delegate(sessionState: state, configuration: configuration)
-        return Lane(session: URLSession(configuration: configuration.sessionConfiguration, delegate: delegate, delegateQueue: nil), state: state, delegate: delegate)
+    /// The main session and, when reads are hedged, a spare one with its own connection. When the spare answers a slow
+    /// read, it becomes the main session for every request, so the next calls do not wait on the connection that stalled;
+    /// the old one is let go once its calls end, and a new spare takes its place.
+    private final class Lanes: @unchecked Sendable {
+        private let lock = NSLock()
+        private let configuration: HTTPConfiguration
+        private var main: Lane
+        private var spare: Lane?
+        private(set) var hedgeWins = 0
+
+        init(_ configuration: HTTPConfiguration) {
+            self.configuration = configuration
+            main = Lane(configuration)
+            spare = configuration.hedgeReadsAfter == nil ? nil : Lane(configuration)
+        }
+
+        var current: (main: Lane, spare: Lane?) {
+            lock.lock()
+            defer { lock.unlock() }
+            return (main, spare)
+        }
+
+        /// The spare answered before `lost` did: it takes over, unless another read already made that change.
+        func promoteSpare(over lost: Lane) {
+            lock.lock()
+            defer { lock.unlock() }
+            guard let spare, lost.session === main.session else { return }
+            main.session.finishTasksAndInvalidate()
+            main = spare
+            self.spare = Lane(configuration)
+            hedgeWins += 1
+        }
     }
 
-    typealias Sign = @Sendable (URLRequest, HTTPEndpoint) throws -> URLRequest
+    /// How many times the spare connection took over from a stalled one.
+    var hedgeWins: Int { _lanes.hedgeWins }
 
     init(
         configuration: HTTPCodableConfiguration,
@@ -40,32 +76,24 @@ final class HTTPSession: Sendable {
         self.configuration = configuration
         _requestSign = requestSign
         _responseValidator = responseValidator
-        let state = HTTPSessionState()
-        _state = state
-        let delegate = URLSession.Delegate(sessionState: state, configuration: configuration)
-
-        _session = URLSession(
-            configuration: configuration.sessionConfiguration,
-            delegate: delegate,
-            delegateQueue: nil
-        )
-        _delegate = delegate
-        _hedge = configuration.hedgeReadsAfter == nil ? nil : Self.lane(configuration)
+        _lanes = Lanes(configuration)
     }
 
     private typealias Received = (Data, HTTPURLResponse, URLSessionTaskMetrics?)
 
-    /// The answer to `urlRequest`; a quick read that is slow is sent a second time on the other session.
+    /// The answer to `urlRequest`; a quick read that is slow is sent a second time on the spare session.
     private func receive(_ urlRequest: URLRequest, quick: Bool) async throws -> Received {
-        let session = _session, state = _state
-        guard quick, let delay = configuration.hedgeReadsAfter, let lane = _hedge else {
-            return try await session.data(with: urlRequest, sessionState: state)
+        let (main, spare) = _lanes.current
+        guard quick, let delay = configuration.hedgeReadsAfter, let spare else {
+            return try await main.session.data(with: urlRequest, sessionState: main.state)
         }
-        return try await hedged(
+        let race = try await hedgedRace(
             after: delay,
-            first: { try await Sendable_(session.data(with: urlRequest, sessionState: state)) },
-            second: { try await Sendable_(lane.session.data(with: urlRequest, sessionState: lane.state)) }
-        ).value
+            first: { try await Sendable_(main.session.data(with: urlRequest, sessionState: main.state)) },
+            second: { try await Sendable_(spare.session.data(with: urlRequest, sessionState: spare.state)) }
+        )
+        if race.secondWon { _lanes.promoteSpare(over: main) }
+        return race.value.value
     }
 
     func perform<Body>(
@@ -73,7 +101,6 @@ final class HTTPSession: Sendable {
         withBaseUrl baseUrl: URL,
         withDecoder decoder: @escaping HTTPDecoder<Body>
     ) async throws(HTTPError) -> HTTPResponse<Body> {
-        let state = _state
         let stamp = request.stamp
         let endpoint = request.endpoint
         var urlRequest: URLRequest
@@ -92,7 +119,7 @@ final class HTTPSession: Sendable {
             throw httpError
         }
 
-        Log.request(urlRequest, endpoint: endpoint, session: _session.configuration, stamp: stamp)
+        Log.request(urlRequest, endpoint: endpoint, session: _lanes.current.main.session.configuration, stamp: stamp)
 
         let dataResponse: HTTPDataResponse
         do {

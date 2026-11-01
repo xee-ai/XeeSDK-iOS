@@ -100,6 +100,27 @@ struct HedgedSessionTests {
         #expect(StallingProtocol.requests(to: host).count == 1)
     }
 
+    @Test func theConnectionThatWonTheHedgeBecomesTheMainOneForEveryRequest() async throws {
+        let host = "stall-3.hedge.test"
+        let http = session()
+        #expect(http.hedgeWins == 0)
+        _ = try await send(http, Read(quick: true), host)
+        #expect(http.hedgeWins == 1)
+        // Reads and writes now go out on the connection that answered; nothing stalls on the old one.
+        let start = Date()
+        _ = try await send(http, Read(quick: true), host)
+        _ = try await send(http, Read(method: .patch, quick: false), host)
+        #expect(Date().timeIntervalSince(start) < 0.3)
+        #expect(http.hedgeWins == 1)
+    }
+
+    @Test func aQuickReadThatAnswersInTimeChangesNothing() async throws {
+        let http = session()
+        _ = try await send(http, Read(quick: true), "fast-3.hedge.test")
+        try await Task.sleep(nanoseconds: 300_000_000)
+        #expect(http.hedgeWins == 0)
+    }
+
     @Test func aQuickReadWaitsAtMostFiveSecondsAndOtherRequestsKeepTheirTimeout() async throws {
         let host = "fast-2.hedge.test"
         _ = try await send(session(), Read(quick: true), host)

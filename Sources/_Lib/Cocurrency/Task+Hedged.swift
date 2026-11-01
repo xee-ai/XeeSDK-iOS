@@ -19,11 +19,20 @@ func hedged<T: Sendable>(
     first: @escaping @Sendable () async throws -> T,
     second: @escaping @Sendable () async throws -> T
 ) async throws -> T {
+    try await hedgedRace(after: delay, first: first, second: second).value
+}
+
+/// ``hedged(after:first:second:)``, also saying whether the second request is the one that answered.
+func hedgedRace<T: Sendable>(
+    after delay: TaskDuration,
+    first: @escaping @Sendable () async throws -> T,
+    second: @escaping @Sendable () async throws -> T
+) async throws -> (value: T, secondWon: Bool) {
     func attempt(_ isFirst: Bool, _ work: @Sendable () async throws -> T) async -> HedgeEvent<T> {
         do { return .attempt(isFirst: isFirst, .success(try await work())) } catch { return .attempt(isFirst: isFirst, .failure(error)) }
     }
 
-    return try await withThrowingTaskGroup(of: HedgeEvent<T>.self) { group in
+    return try await withThrowingTaskGroup(of: HedgeEvent<T>.self) { group -> (value: T, secondWon: Bool) in
         group.addTask { await attempt(true, first) }
         group.addTask { .timer(fired: (try? await Task.sleep(duration: delay)) != nil) }
 
@@ -40,9 +49,9 @@ func hedged<T: Sendable>(
             switch event {
             case let .timer(fired):
                 if fired { startSecond() }
-            case let .attempt(_, .success(value)):
+            case let .attempt(isFirst, .success(value)):
                 group.cancelAll()
-                return value
+                return (value, !isFirst)
             case let .attempt(isFirst: true, .failure(error)):
                 firstError = error
                 if secondFailed {

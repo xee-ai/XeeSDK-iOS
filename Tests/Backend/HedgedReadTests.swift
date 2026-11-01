@@ -65,6 +65,17 @@ struct HedgedReadTests {
         }
     }
 
+    @Test func theRaceSaysWhichRequestWon() async throws {
+        let quick = try await hedgedRace(after: delay, first: { 1 }, second: { 2 })
+        #expect(quick.value == 1 && !quick.secondWon)
+        let slow = try await hedgedRace(
+            after: delay,
+            first: { try await Task.sleep(nanoseconds: 3_000_000_000); return 1 },
+            second: { 2 }
+        )
+        #expect(slow.value == 2 && slow.secondWon)
+    }
+
     // MARK: fail-fast timeout
 
     private let t0 = Date(timeIntervalSince1970: 1_800_000_000)
